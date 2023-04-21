@@ -24,7 +24,7 @@ func RegisterRouter(router *gin.Engine) {
 		// out of scopes router
 		api.POST("/outscope", middlewares.ValidateSingleDomain, middlewares.ValidateWildCard,
 			middlewares.ValidateIPAddress,
-			middlewares.ValidateScopes, outscope.AddOutScope)
+			middlewares.ValidateScopes, middlewares.OutScopeCheck, outscope.AddOutScope)
 
 		api.GET("/outscope/:companyname", outscope.GetOutofScopes)
 		api.GET("/outscope", outscope.GetAllOutofScopes)

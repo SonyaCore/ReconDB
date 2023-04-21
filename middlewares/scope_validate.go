@@ -6,12 +6,18 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"io"
 	"log"
 	"net/http"
+	"regexp"
 )
+
+var scopeUri = "/api/scope"
 
 func ValidateScopes(c *gin.Context) {
 	var Scope models.Scopes
@@ -68,20 +74,60 @@ func OutScopeCheck(c *gin.Context) {
 	// Restore the io.ReadCloser to its original state
 	c.Request.Body = io.NopCloser(bytes.NewBuffer(rawBody))
 
-	collection := database.Collection("OutofScopes")
-	results, err := collection.CountDocuments(ctx, bson.M{"companyname": Scope.CompanyName})
+	ScopeQuery := bson.M{
+		"companyname": Scope.CompanyName,
+		"scopetype":   Scope.ScopeType,
+		"scope": primitive.Regex{
+			Pattern: "^" + regexp.QuoteMeta(Scope.Scope) + "$",
+			Options: "i",
+		},
+	}
+
+	var collection *mongo.Collection
+	var results int64
+
+	// only use this section if request uri was /api/scope
+	if c.Request.RequestURI == scopeUri {
+		collection = database.Collection("Scopes")
+		results, err = collection.CountDocuments(ctx, ScopeQuery)
+
+		if results >= 1 {
+			c.JSON(http.StatusNotAcceptable, gin.H{
+				"input":  Scope.Scope,
+				"result": "duplicate entry",
+				"status": http.StatusNotAcceptable,
+			})
+			c.Abort()
+			return
+		}
+
+	}
+
+	collection = database.Collection("OutofScopes")
+	results, err = collection.CountDocuments(ctx, ScopeQuery)
 	if err != nil {
 		log.Print(err.Error())
 	}
 
+	fmt.Println("document count", results)
 	if results >= 1 {
+		if c.Request.RequestURI == "/api/outscope" {
+			c.JSON(http.StatusNotAcceptable, gin.H{
+				"companyname": Scope.CompanyName,
+				"result":      "duplicate entry",
+				"status":      http.StatusNotAcceptable,
+			})
+			c.Abort()
+			return
+		}
 		c.JSON(http.StatusNotAcceptable, gin.H{
-			"companyname": Scope.CompanyName,
-			"result":      "company name are in outofscope",
-			"status":      http.StatusNotAcceptable,
+			"scope":  Scope.Scope,
+			"result": "out of scope",
+			"status": http.StatusNotAcceptable,
 		})
 		c.Abort()
 		return
 	}
+
 	c.Next()
 }

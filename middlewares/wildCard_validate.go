@@ -32,8 +32,7 @@ func ValidateWildCard(c *gin.Context) {
 	}
 
 	if strings.ToLower(Scope.ScopeType) == "wildcard" {
-		regex := regexp.MustCompile(WildCardPattern)
-		if regex.MatchString(Scope.Scope) {
+		if WildCardRegex(Scope.Scope) {
 			c.Next()
 			return
 		}
@@ -47,4 +46,12 @@ func ValidateWildCard(c *gin.Context) {
 	}
 
 	c.Next()
+}
+
+func WildCardRegex(query string) bool {
+	regex := regexp.MustCompile(WildCardPattern)
+	if regex.MatchString(query) {
+		return true
+	}
+	return false
 }

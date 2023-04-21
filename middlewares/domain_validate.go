@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-func validateDomainName(domain string) bool {
+func ValidateDomainName(domain string) bool {
 
 	var RegExp = regexp.MustCompile(DomainPattern)
 
@@ -40,7 +40,7 @@ func ValidateSingleDomain(c *gin.Context) {
 	}
 
 	if strings.ToLower(Scope.ScopeType) == "single" {
-		if !validateDomainName(Scope.Scope) {
+		if !ValidateDomainName(Scope.Scope) {
 			c.JSON(http.StatusNotAcceptable, gin.H{
 				"input":  Scope.Scope,
 				"error":  fmt.Sprintf("domain Name %s is invalid", Scope.Scope),

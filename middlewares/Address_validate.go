@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-func checkIPAddress(ip string) error {
+func CheckIPAddress(ip string) error {
 	if net.ParseIP(ip) == nil {
 
 		return fmt.Errorf("invalid IP Address: %s", ip)
@@ -41,7 +41,7 @@ func ValidateIPAddress(c *gin.Context) {
 	}
 
 	if strings.ToLower(Scope.ScopeType) == "cidr" {
-		ip, n, err := net.ParseCIDR(Scope.Scope)
+		ip, n, err := ParseCidr(Scope.Scope)
 		if err != nil {
 			c.JSON(http.StatusNotAcceptable, gin.H{
 				"input":  Scope.Scope,
@@ -65,7 +65,7 @@ func ValidateIPAddress(c *gin.Context) {
 	}
 
 	if strings.ToLower(Scope.ScopeType) == "ip" {
-		err := checkIPAddress(Scope.Scope)
+		err := CheckIPAddress(Scope.Scope)
 		if err != nil {
 			c.JSON(http.StatusNotAcceptable, gin.H{
 				"input":  Scope.Scope,
@@ -79,4 +79,9 @@ func ValidateIPAddress(c *gin.Context) {
 		return
 	}
 	c.Next()
+}
+
+func ParseCidr(cidr string) (net.IP, *net.IPNet, error) {
+	ip, n, err := net.ParseCIDR(cidr)
+	return ip, n, err
 }
