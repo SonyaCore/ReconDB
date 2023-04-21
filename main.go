@@ -5,6 +5,7 @@ import (
 	"ReconDB/routers"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 	"runtime"
 	"strings"
 )
@@ -23,21 +24,27 @@ func Version() string {
 // VersionStatement returns a list of strings representing the full version info.
 func VersionStatement() string {
 	return strings.Join([]string{
-		// project name
+		// Project name
 		"ReconDB ", Version(), " (", codename, ") ", build,
-		// go runtime
+		// Go runtime
 		" (", runtime.Version(), " ", runtime.GOOS, "/", runtime.GOARCH, ")",
-		// gin version
+		// Gin version
 		" ", "Gin", " ", gin.Version,
 	}, "")
 }
 
 func main() {
 	fmt.Println(VersionStatement())
+	// register gin engine
 	router := gin.New()
 
+	// initial config file
+	config.LoadConfig(".")
+	PORT := viper.GetString("port")
+
+	// config gin engine & register routers
 	config.GinInit(router)
 	routers.RegisterRouter(router)
 
-	router.Run(":8080")
+	router.Run(PORT)
 }
