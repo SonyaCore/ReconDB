@@ -35,7 +35,7 @@ func AddCompany(c *gin.Context) {
 	})
 }
 
-func GetCompany(c *gin.Context) {
+func GetAllCompanies(c *gin.Context) {
 	var ctx = context.TODO()
 	var Company []bson.M
 
@@ -46,6 +46,27 @@ func GetCompany(c *gin.Context) {
 	}
 
 	if err = results.All(ctx, &Company); err != nil {
+		log.Println(err)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"companies": Company,
+		"status":    http.StatusOK,
+	})
+}
+
+func GetCompany(c *gin.Context) {
+	var Param = c.Param("companyname")
+	var ctx = context.TODO()
+	var Company []bson.M
+
+	collection := database.Collection("Company")
+	filter, err := collection.Find(ctx, bson.M{"companyname": Param})
+	if err != nil {
+		log.Print(err.Error())
+	}
+
+	if err = filter.All(ctx, &Company); err != nil {
 		log.Println(err)
 	}
 

@@ -36,7 +36,7 @@ func AddAsset(c *gin.Context) {
 
 }
 
-func GetAssets(c *gin.Context) {
+func GetAllAssets(c *gin.Context) {
 	var ctx = context.TODO()
 	var Assets []bson.M
 
@@ -47,6 +47,27 @@ func GetAssets(c *gin.Context) {
 	}
 
 	if err = results.All(ctx, &Assets); err != nil {
+		log.Println(err)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"assets": Assets,
+		"status": http.StatusOK,
+	})
+}
+
+func GetAsset(c *gin.Context) {
+	var Param = c.Param("asset")
+	var ctx = context.TODO()
+	var Assets []bson.M
+
+	collection := database.Collection("Assets")
+	filter, err := collection.Find(ctx, bson.M{"asset": Param})
+	if err != nil {
+		log.Print(err.Error())
+	}
+
+	if err = filter.All(ctx, &Assets); err != nil {
 		log.Println(err)
 	}
 
