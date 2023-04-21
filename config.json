@@ -1,4 +1,5 @@
 {
+  "gin_mode": "debug",
   "port": ":8080",
   "mongo_uri": "mongodb://localhost:27017"
 }

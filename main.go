@@ -36,15 +36,15 @@ func VersionStatement() string {
 
 func main() {
 	fmt.Println(VersionStatement())
-	// register gin engine
-	router := gin.New()
 
 	// initial config file
 	config.LoadConfig(".")
 	PORT := viper.GetString("port")
 
+	// register gin engine
+	router := config.GinInit()
+
 	// config gin engine & register routers
-	config.GinInit(router)
 	routers.RegisterRouter(router)
 
 	// load mongodb

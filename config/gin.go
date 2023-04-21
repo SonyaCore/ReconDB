@@ -3,10 +3,32 @@ package config
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
+	"log"
 	"time"
 )
 
-func GinInit(router *gin.Engine) {
+var GinModes = []string{
+	"debug", "release",
+}
+
+func GinInit() *gin.Engine {
+	var ginMode = viper.GetString("gin_mode")
+	if ginMode == "" || len(ginMode) <= 3 {
+		log.Fatalf("\u001B[91mgin_mode is empty.\u001B[0m avaliable modes : %v", GinModes)
+	}
+
+	switch ginMode {
+	case GinModes[0]:
+		gin.SetMode(gin.DebugMode)
+	case GinModes[1]:
+		gin.SetMode(gin.ReleaseMode)
+	default:
+		log.Fatal("No gin_mode set in config.json")
+	}
+
+	router := gin.New()
+
 	// LoggerWithFormatter middleware will write the logs to gin.DefaultWriter
 	// By default gin.DefaultWriter = os.Stdout
 	router.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
@@ -26,4 +48,5 @@ func GinInit(router *gin.Engine) {
 	// use recovery to recover panics
 	router.Use(gin.Recovery())
 
+	return router
 }
