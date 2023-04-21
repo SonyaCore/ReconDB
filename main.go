@@ -1,7 +1,10 @@
 package main
 
 import (
+	"ReconDB/config"
+	"ReconDB/routers"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"runtime"
 	"strings"
 )
@@ -20,10 +23,21 @@ func Version() string {
 // VersionStatement returns a list of strings representing the full version info.
 func VersionStatement() string {
 	return strings.Join([]string{
-		"ReconDB ", Version(), " (", codename, ") ", build, " (", runtime.Version(), " ", runtime.GOOS, "/", runtime.GOARCH, ")",
+		// project name
+		"ReconDB ", Version(), " (", codename, ") ", build,
+		// go runtime
+		" (", runtime.Version(), " ", runtime.GOOS, "/", runtime.GOARCH, ")",
+		// gin version
+		" ", "Gin", " ", gin.Version,
 	}, "")
 }
 
 func main() {
 	fmt.Println(VersionStatement())
+	router := gin.New()
+
+	config.GinInit(router)
+	routers.RegisterRouter(router)
+
+	router.Run(":8080")
 }
