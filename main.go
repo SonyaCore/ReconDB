@@ -2,6 +2,7 @@ package main
 
 import (
 	"ReconDB/config"
+	"ReconDB/database"
 	"ReconDB/routers"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -46,5 +47,11 @@ func main() {
 	config.GinInit(router)
 	routers.RegisterRouter(router)
 
+	// load mongodb
+	client := database.MongoDB()
+	database.Ping(client)
+	fmt.Println("\u001B[92mConnected to MongoDB", viper.GetString("mongo_uri"), "\u001B[0m")
+
+	// run gin
 	router.Run(PORT)
 }
