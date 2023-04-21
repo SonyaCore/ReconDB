@@ -76,3 +76,20 @@ func GetAsset(c *gin.Context) {
 		"status": http.StatusOK,
 	})
 }
+
+func DeleteAsset(c *gin.Context) {
+	var Param = c.Param("asset")
+	var ctx = context.TODO()
+
+	collection := database.Collection("Assets")
+	filter, err := collection.DeleteMany(ctx, bson.M{"asset": Param})
+	if err != nil {
+		log.Print(err.Error())
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"AssetName":    Param,
+		"DeletedCount": filter.DeletedCount,
+		"status":       http.StatusOK,
+	})
+}

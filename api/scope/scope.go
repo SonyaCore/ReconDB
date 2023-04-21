@@ -56,12 +56,12 @@ func GetAllScopes(c *gin.Context) {
 }
 
 func GetScopes(c *gin.Context) {
-	var Param = c.Param("scope")
+	var Param = c.Param("companyname")
 	var ctx = context.TODO()
 	var Scopes []bson.M
 
 	collection := database.Collection("Scopes")
-	results, err := collection.Find(ctx, bson.M{"scope": Param})
+	results, err := collection.Find(ctx, bson.M{"companyname": Param})
 	if err != nil {
 		log.Print(err.Error())
 	}
@@ -73,5 +73,22 @@ func GetScopes(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"results": Scopes,
 		"status":  http.StatusOK,
+	})
+}
+
+func DeleteScopes(c *gin.Context) {
+	var Param = c.Param("companyname")
+	var ctx = context.TODO()
+
+	collection := database.Collection("Scopes")
+	filter, err := collection.DeleteMany(ctx, bson.M{"companyname": Param})
+	if err != nil {
+		log.Print(err.Error())
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"CompanyName":  Param,
+		"DeletedCount": filter.DeletedCount,
+		"Status":       http.StatusOK,
 	})
 }

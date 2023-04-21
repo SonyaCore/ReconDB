@@ -51,17 +51,17 @@ func GetAllOutofScopes(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"results": OutofScopes,
-		"status":  http.StatusOK,
+		"Status":  http.StatusOK,
 	})
 }
 
 func GetOutofScopes(c *gin.Context) {
-	var Param = c.Param("scope")
+	var Param = c.Param("companyname")
 	var ctx = context.TODO()
 	var OutofScopes []bson.M
 
 	collection := database.Collection("OutofScopes")
-	results, err := collection.Find(ctx, bson.M{"scope": Param})
+	results, err := collection.Find(ctx, bson.M{"companyname": Param})
 	if err != nil {
 		log.Print(err.Error())
 	}
@@ -71,7 +71,24 @@ func GetOutofScopes(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"results": OutofScopes,
-		"status":  http.StatusOK,
+		"Results": OutofScopes,
+		"Status":  http.StatusOK,
+	})
+}
+
+func DeleteOutofScopes(c *gin.Context) {
+	var Param = c.Param("companyname")
+	var ctx = context.TODO()
+
+	collection := database.Collection("OutofScopes")
+	filter, err := collection.DeleteMany(ctx, bson.M{"companyname": Param})
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"CompanyName":  Param,
+		"DeletedCount": filter.DeletedCount,
+		"Status":       http.StatusOK,
 	})
 }

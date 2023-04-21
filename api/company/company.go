@@ -75,3 +75,20 @@ func GetCompany(c *gin.Context) {
 		"status":    http.StatusOK,
 	})
 }
+
+func DeleteCompany(c *gin.Context) {
+	var Param = c.Param("companyname")
+	var ctx = context.TODO()
+
+	collection := database.Collection("Company")
+	filter, err := collection.DeleteMany(ctx, bson.M{"companyname": Param})
+	if err != nil {
+		log.Print(err.Error())
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"CompanyName":  Param,
+		"DeletedCount": filter.DeletedCount,
+		"status":       http.StatusOK,
+	})
+}

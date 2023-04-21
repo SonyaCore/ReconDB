@@ -13,7 +13,7 @@ import (
 
 // Program Info
 var (
-	version  = "0.2"
+	version  = "0.3.0"
 	build    = "Custom"
 	codename = "ReconDB , ReconDB Service."
 )
@@ -49,6 +49,7 @@ func main() {
 
 	// load mongodb
 	client := database.Client()
+	// ping database connection
 	database.Ping(client)
 	fmt.Println("\u001B[92mConnected to MongoDB", viper.GetString("mongo_uri"), "\u001B[0m")
 
