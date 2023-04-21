@@ -30,20 +30,17 @@ func ValidateScopes(c *gin.Context) {
 	c.Request.Body = io.NopCloser(bytes.NewBuffer(rawBody))
 
 	for i, _ := range Scopes {
-
 		if Scope.ScopeType == Scopes[i] {
 			c.Next()
 			return
 		}
-
-		c.JSON(http.StatusFailedDependency, gin.H{
-			"error":       "scope type is not valid",
-			"valid_types": Scopes,
-			"status":      http.StatusFailedDependency,
-		})
-
-		c.Abort()
-		return
+		continue
 	}
-
+	c.JSON(http.StatusFailedDependency, gin.H{
+		"error":       "scope type is not valid",
+		"valid_types": Scopes,
+		"status":      http.StatusFailedDependency,
+	})
+	c.Abort()
+	return
 }

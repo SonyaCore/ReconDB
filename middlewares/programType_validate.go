@@ -4,10 +4,12 @@ import (
 	"ReconDB/models"
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
 	"log"
 	"net/http"
+	"strings"
 )
 
 func ProgramType(c *gin.Context) {
@@ -30,20 +32,19 @@ func ProgramType(c *gin.Context) {
 	c.Request.Body = io.NopCloser(bytes.NewBuffer(rawBody))
 
 	for i, _ := range ProgramTypes {
-
-		if Company.ProgramType == ProgramTypes[i] {
+		if strings.ToLower(Company.ProgramType) == ProgramTypes[i] {
+			fmt.Println("valid")
 			c.Next()
 			return
 		}
-
-		c.JSON(http.StatusFailedDependency, gin.H{
-			"error":       "program type is not valid",
-			"valid_types": ProgramTypes,
-			"status":      http.StatusFailedDependency,
-		})
-
-		c.Abort()
-		return
+		continue
 	}
+	c.JSON(http.StatusFailedDependency, gin.H{
+		"error":       "program type is not valid",
+		"valid_types": ProgramTypes,
+		"status":      http.StatusFailedDependency,
+	})
+	c.Abort()
+	return
 
 }

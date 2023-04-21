@@ -3,7 +3,10 @@ package asset
 import (
 	"ReconDB/database"
 	"ReconDB/models"
+	"context"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
+	"log"
 	"net/http"
 )
 
@@ -31,4 +34,24 @@ func AddAsset(c *gin.Context) {
 		"status":       http.StatusOK,
 	})
 
+}
+
+func GetAssets(c *gin.Context) {
+	var ctx = context.TODO()
+	var Assets []bson.M
+
+	collection := database.Collection("Assets")
+	results, err := collection.Find(ctx, bson.M{})
+	if err != nil {
+		log.Print(err.Error())
+	}
+
+	if err = results.All(ctx, &Assets); err != nil {
+		log.Println(err)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"assets": Assets,
+		"status": http.StatusOK,
+	})
 }

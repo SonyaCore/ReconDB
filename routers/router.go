@@ -20,9 +20,11 @@ func RegisterRouter(router *gin.Engine) {
 
 		// company router
 		api.POST("/company", middlewares.ProgramType, company.AddCompany)
+		api.GET("/company", company.GetCompany)
 
 		// asset router
 		api.POST("/asset", asset.AddAsset)
+		api.GET("/asset", asset.GetAssets)
 
 	}
 }

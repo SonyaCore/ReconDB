@@ -3,7 +3,10 @@ package company
 import (
 	"ReconDB/database"
 	"ReconDB/models"
+	"context"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
+	"log"
 	"net/http"
 )
 
@@ -29,5 +32,25 @@ func AddCompany(c *gin.Context) {
 		"message":      "company added",
 		"result":       Company,
 		"status":       http.StatusOK,
+	})
+}
+
+func GetCompany(c *gin.Context) {
+	var ctx = context.TODO()
+	var Company []bson.M
+
+	collection := database.Collection("Company")
+	results, err := collection.Find(ctx, bson.M{})
+	if err != nil {
+		log.Print(err.Error())
+	}
+
+	if err = results.All(ctx, &Company); err != nil {
+		log.Println(err)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"companies": Company,
+		"status":    http.StatusOK,
 	})
 }
