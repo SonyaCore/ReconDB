@@ -4,6 +4,7 @@ import (
 	"ReconDB/models"
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
 	"log"
@@ -12,7 +13,14 @@ import (
 	"strings"
 )
 
-func ValidateWildCard(c *gin.Context) {
+func validateDomainName(domain string) bool {
+
+	var RegExp = regexp.MustCompile(DomainPattern)
+
+	return RegExp.MatchString(domain)
+}
+
+func ValidateSingleDomain(c *gin.Context) {
 	var Scope models.Scopes
 
 	// Read the content
@@ -31,20 +39,18 @@ func ValidateWildCard(c *gin.Context) {
 		return
 	}
 
-	if strings.ToLower(Scope.ScopeType) == "wildcard" {
-		regex := regexp.MustCompile(WildCardPattern)
-		if regex.MatchString(Scope.Scope) {
-			c.Next()
+	if strings.ToLower(Scope.ScopeType) == "single" {
+		if !validateDomainName(Scope.Scope) {
+			c.JSON(http.StatusNotAcceptable, gin.H{
+				"input":  Scope.Scope,
+				"error":  fmt.Sprintf("domain Name %s is invalid", Scope.Scope),
+				"status": http.StatusNotAcceptable,
+			})
+			c.Abort()
 			return
 		}
-		c.JSON(http.StatusNotAcceptable, gin.H{
-			"input":  Scope.Scope,
-			"error":  "host wildcard is not acceptable",
-			"status": http.StatusNotAcceptable,
-		})
-		c.Abort()
+		c.Next()
 		return
 	}
-
 	c.Next()
 }

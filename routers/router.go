@@ -13,7 +13,8 @@ func RegisterRouter(router *gin.Engine) {
 	api := router.Group("/api")
 	{
 		// scope router
-		api.POST("/scope", middlewares.ValidateWildCard, middlewares.ValidateIPAddress, middlewares.OutScopeCheck,
+		api.POST("/scope", middlewares.ValidateSingleDomain, middlewares.ValidateWildCard,
+			middlewares.ValidateIPAddress, middlewares.OutScopeCheck,
 			middlewares.ValidateScopes, scope.AddScope)
 
 		api.GET("/scope/:companyname", scope.GetScopes)
@@ -21,7 +22,8 @@ func RegisterRouter(router *gin.Engine) {
 		api.DELETE("/scope/:companyname", scope.DeleteScopes)
 
 		// out of scopes router
-		api.POST("/outscope", middlewares.ValidateWildCard, middlewares.ValidateIPAddress,
+		api.POST("/outscope", middlewares.ValidateSingleDomain, middlewares.ValidateWildCard,
+			middlewares.ValidateIPAddress,
 			middlewares.ValidateScopes, outscope.AddOutScope)
 
 		api.GET("/outscope/:companyname", outscope.GetOutofScopes)
