@@ -9,7 +9,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var Collection *mongo.Collection
 var Ctx = context.TODO()
 
 func Client() *mongo.Client {
