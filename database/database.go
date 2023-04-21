@@ -12,7 +12,7 @@ import (
 var Collection *mongo.Collection
 var Ctx = context.TODO()
 
-func MongoDB() *mongo.Client {
+func Client() *mongo.Client {
 	var mongoUri = viper.GetString("mongo_uri")
 
 	clientOptions := options.Client().ApplyURI(mongoUri)
@@ -20,8 +20,6 @@ func MongoDB() *mongo.Client {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	//defer client.Disconnect(ctx)
 
 	//collection = client.Database("ReconDB").Collection("scopes")
 

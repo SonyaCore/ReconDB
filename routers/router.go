@@ -1,15 +1,28 @@
 package routers
 
 import (
-	"ReconDB/api/test"
+	"ReconDB/api/asset"
+	"ReconDB/api/company"
+	"ReconDB/api/outscope"
+	"ReconDB/api/scope"
+	"ReconDB/middlewares"
 	"github.com/gin-gonic/gin"
 )
 
 func RegisterRouter(router *gin.Engine) {
-	v2 := router.Group("/api")
+	api := router.Group("/api")
 	{
+		// scope router
+		api.POST("/scope", middlewares.ValidateScopes, scope.AddScope)
 
-		v2.GET("/ping", test.Hello)
+		// out of scopes router
+		api.POST("/outscope", middlewares.ValidateScopes, outscope.AddOutScope)
+
+		// company router
+		api.POST("/company", middlewares.ProgramType, company.AddCompany)
+
+		// asset router
+		api.POST("/asset", asset.AddAsset)
 
 	}
 }

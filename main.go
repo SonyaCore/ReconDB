@@ -13,7 +13,7 @@ import (
 
 // Program Info
 var (
-	version  = "0.1"
+	version  = "0.2"
 	build    = "Custom"
 	codename = "ReconDB , ReconDB Service."
 )
@@ -48,7 +48,7 @@ func main() {
 	routers.RegisterRouter(router)
 
 	// load mongodb
-	client := database.MongoDB()
+	client := database.Client()
 	database.Ping(client)
 	fmt.Println("\u001B[92mConnected to MongoDB", viper.GetString("mongo_uri"), "\u001B[0m")
 
