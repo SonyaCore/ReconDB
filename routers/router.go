@@ -13,7 +13,9 @@ func RegisterRouter(router *gin.Engine) {
 	api := router.Group("/api")
 	{
 		// scope router
-		api.POST("/scope", middlewares.OutScopeCheck, middlewares.ValidateScopes, scope.AddScope)
+		api.POST("/scope", middlewares.ValidateWildCard, middlewares.ValidateIPAddress, middlewares.OutScopeCheck,
+			middlewares.ValidateScopes, scope.AddScope)
+
 		api.GET("/scope/:companyname", scope.GetScopes)
 		api.GET("/scope", scope.GetAllScopes)
 		api.DELETE("/scope/:companyname", scope.DeleteScopes)

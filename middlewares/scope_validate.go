@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"io"
@@ -74,7 +73,6 @@ func OutScopeCheck(c *gin.Context) {
 	if err != nil {
 		log.Print(err.Error())
 	}
-	fmt.Println(results)
 
 	if results >= 1 {
 		c.JSON(http.StatusNotAcceptable, gin.H{
