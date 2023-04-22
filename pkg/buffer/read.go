@@ -10,8 +10,7 @@ import (
 func ReadBuffer(c *gin.Context) ([]byte, error) {
 	rawBody, err := io.ReadAll(c.Request.Body)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, rawBody)
-		c.Abort()
+		c.AbortWithStatusJSON(http.StatusBadRequest, rawBody)
 		return nil, err
 	}
 	// restore the buffer to C.Request.Body

@@ -19,11 +19,10 @@ func AddCompany(c *gin.Context) {
 	collection := database.Collection("Company")
 	result, err := collection.InsertOne(database.Ctx, Company)
 	if err != nil {
-		c.JSON(http.StatusFailedDependency, gin.H{
+		c.AbortWithStatusJSON(http.StatusFailedDependency, gin.H{
 			"error":  err.Error(),
 			"status": http.StatusFailedDependency,
 		})
-		c.Abort()
 		return
 	}
 

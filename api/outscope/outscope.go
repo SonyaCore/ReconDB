@@ -19,11 +19,10 @@ func AddOutScope(c *gin.Context) {
 	collection := database.Collection("OutofScopes")
 	result, err := collection.InsertOne(database.Ctx, Scope)
 	if err != nil {
-		c.JSON(http.StatusFailedDependency, gin.H{
+		c.AbortWithStatusJSON(http.StatusFailedDependency, gin.H{
 			"error":  err.Error(),
 			"status": http.StatusFailedDependency,
 		})
-		c.Abort()
 		return
 	}
 

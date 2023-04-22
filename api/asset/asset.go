@@ -3,10 +3,10 @@ package asset
 import (
 	"ReconDB/database"
 	"ReconDB/models"
+	"ReconDB/pkg/type"
 	"context"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"net/http"
 )
@@ -17,67 +17,20 @@ func AddAsset(c *gin.Context) {
 
 	// Bind the JSON data to the Asset struct
 	if err = c.ShouldBindJSON(&asset); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error":  "invalid request",
 			"status": http.StatusBadRequest,
 		})
-		c.Abort()
 		return
 	}
 
 	// Find the asset type of the given asset
-	asset.AssetType, err = FindAssetType(asset)
+	asset.AssetType, err = _type.FindAssetType(asset)
 	if err != nil {
-		c.JSON(http.StatusFailedDependency, gin.H{
+		c.AbortWithStatusJSON(http.StatusFailedDependency, gin.H{
 			"error":  err.Error(),
 			"status": http.StatusFailedDependency,
 		})
-		c.Abort()
-		return
-	}
-
-	// Find the matching scope for the given asset
-	collectionScope := database.Collection("Scopes")
-
-	// find company name based on scope
-	scopeQuery := bson.M{
-		//"scopetype": asset.AssetType,
-		"scope": asset.Scope,
-	}
-
-	opts := options.FindOne().SetProjection(bson.M{"companyname": 1})
-
-	var scopeResult struct {
-		CompanyName string `bson:"companyname"`
-	}
-
-	if err = collectionScope.FindOne(context.Background(), scopeQuery, opts).Decode(&scopeResult); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":  "company name not found in scope",
-			"status": http.StatusBadRequest,
-		})
-		c.Abort()
-		return
-	}
-
-	// Check if the asset is in the out-of-scope collection
-	outOfScopeQuery := bson.M{
-		"companyname": scopeResult.CompanyName,
-		"scopetype":   asset.AssetType,
-		"scope":       asset.Asset,
-	}
-
-	var outOfScope int64
-	if outOfScope, err = database.CountDocuments("OutofScopes", outOfScopeQuery); err != nil {
-		outOfScope = 0
-	}
-	if outOfScope > 0 {
-		c.JSON(http.StatusNotAcceptable, gin.H{
-			"error":  "asset is out of scope",
-			"asset":  asset.Asset,
-			"status": http.StatusNotAcceptable,
-		})
-		c.Abort()
 		return
 	}
 
@@ -85,11 +38,10 @@ func AddAsset(c *gin.Context) {
 	collection := database.Collection("Assets")
 	result, err := collection.InsertOne(database.Ctx, asset)
 	if err != nil {
-		c.JSON(http.StatusFailedDependency, gin.H{
+		c.AbortWithStatusJSON(http.StatusFailedDependency, gin.H{
 			"error":  err.Error(),
 			"status": http.StatusFailedDependency,
 		})
-		c.Abort()
 		return
 	}
 
@@ -115,7 +67,7 @@ func GetAllAssets(c *gin.Context) {
 		log.Println(err)
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	c.AbortWithStatusJSON(http.StatusOK, gin.H{
 		"assets": Assets,
 		"status": http.StatusOK,
 	})

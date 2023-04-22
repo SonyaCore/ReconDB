@@ -84,23 +84,21 @@ func OutScopeCheck(c *gin.Context) {
 
 		results, err = database.CountDocuments("Company", companyQuery)
 		if results == 0 {
-			c.JSON(http.StatusNotAcceptable, gin.H{
+			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 				"input":  Scope.Scope,
 				"result": "Scope is not registered for this company.",
 				"status": http.StatusNotAcceptable,
 			})
-			c.Abort()
 			return
 		}
 
 		results, err = database.CountDocuments("Scopes", ScopeQuery)
 		if results >= 1 {
-			c.JSON(http.StatusNotAcceptable, gin.H{
+			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 				"input":  Scope.Scope,
 				"result": "duplicate entry",
 				"status": http.StatusNotAcceptable,
 			})
-			c.Abort()
 			return
 		}
 	}
@@ -112,21 +110,19 @@ func OutScopeCheck(c *gin.Context) {
 
 	if results >= 1 {
 		if c.Request.RequestURI == outScopeUri {
-			c.JSON(http.StatusNotAcceptable, gin.H{
+			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 				"companyname": Scope.CompanyName,
 				"result":      "duplicate entry",
 				"status":      http.StatusNotAcceptable,
 			})
-			c.Abort()
 			return
 		}
 
-		c.JSON(http.StatusNotAcceptable, gin.H{
+		c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 			"scope":  Scope.Scope,
 			"result": "out of scope",
 			"status": http.StatusNotAcceptable,
 		})
-		c.Abort()
 		return
 	}
 

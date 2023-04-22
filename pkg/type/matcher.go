@@ -1,4 +1,4 @@
-package asset
+package _type
 
 import (
 	"ReconDB/middlewares/address"

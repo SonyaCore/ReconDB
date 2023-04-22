@@ -31,12 +31,11 @@ func CompanyValidate(c *gin.Context) {
 
 	results, err = database.CountDocuments("Company", companyQuery)
 	if results >= 1 {
-		c.JSON(http.StatusNotAcceptable, gin.H{
+		c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 			"company": Company.CompanyName,
 			"result":  "duplicate entry",
 			"status":  http.StatusNotAcceptable,
 		})
-		c.Abort()
 		return
 	}
 	c.Next()

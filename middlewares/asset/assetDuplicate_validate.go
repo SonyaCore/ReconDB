@@ -37,20 +37,18 @@ func DuplicateValidate(c *gin.Context) {
 	// Check if the asset is already in the Asset collection
 	count, collectionError := database.CountDocuments("Assets", assetQuery)
 	if collectionError != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"error":  "failed to count documents in Assets collection",
 			"status": http.StatusInternalServerError,
 		})
-		c.Abort()
 		return
 	}
 	if count > 0 {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error":  "duplicate entry",
 			"input":  Asset.Asset,
 			"status": http.StatusBadRequest,
 		})
-		c.Abort()
 		return
 	}
 	c.Next()

@@ -31,11 +31,10 @@ func ProgramType(c *gin.Context) {
 		continue
 	}
 
-	c.JSON(http.StatusFailedDependency, gin.H{
+	c.AbortWithStatusJSON(http.StatusFailedDependency, gin.H{
 		"error":       "program type is not valid",
 		"valid_types": middlewares.ProgramTypes,
 		"status":      http.StatusFailedDependency,
 	})
-	c.Abort()
 	return
 }

@@ -11,11 +11,10 @@ func CheckAuth(c *gin.Context) {
 	var header = c.Request.Header.Get("Authorization")
 
 	if token != header {
-		c.JSON(http.StatusUnauthorized, gin.H{
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"error":  "Unauthorized Access",
 			"status": http.StatusUnauthorized,
 		})
-		c.Abort()
 		return
 	}
 	c.Next()

@@ -9,6 +9,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -34,21 +35,19 @@ func ValidateIPAddress(c *gin.Context) {
 	if strings.ToLower(Scope.ScopeType) == "cidr" {
 		ip, n, err := ParseCidr(Scope.Scope)
 		if err != nil {
-			c.JSON(http.StatusNotAcceptable, gin.H{
+			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 				"input":  Scope.Scope,
 				"error":  err.Error(),
 				"status": http.StatusNotAcceptable,
 			})
-			c.Abort()
 			return
 		}
 
 		if !n.IP.Equal(ip) {
-			c.JSON(http.StatusNotAcceptable, gin.H{
+			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 				"error":  fmt.Sprintf("got %s; want %v\n", Scope.Scope, n),
 				"status": http.StatusNotAcceptable,
 			})
-			c.Abort()
 			return
 		}
 		c.Next()
@@ -56,14 +55,36 @@ func ValidateIPAddress(c *gin.Context) {
 	}
 
 	if strings.ToLower(Scope.ScopeType) == "ip" {
-		err := CheckIPAddress(Scope.Scope)
-		if err != nil {
-			c.JSON(http.StatusNotAcceptable, gin.H{
+		if strings.Contains(Scope.Scope, ":") {
+			parts := strings.Split(Scope.Scope, ":")
+			ip := parts[0]
+			port := parts[1]
+			if err := CheckIPAddress(ip); err != nil {
+				c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
+					"input":  Scope.Scope,
+					"error":  err.Error(),
+					"status": http.StatusNotAcceptable,
+				})
+				return
+			}
+			if err := CheckPort(port); err != nil {
+				c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
+					"input":  Scope.Scope,
+					"error":  err.Error(),
+					"status": http.StatusNotAcceptable,
+				})
+				return
+			}
+			c.Next()
+			return
+		}
+
+		if err := CheckIPAddress(Scope.Scope); err != nil {
+			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 				"input":  Scope.Scope,
 				"error":  err.Error(),
 				"status": http.StatusNotAcceptable,
 			})
-			c.Abort()
 			return
 		}
 		c.Next()
@@ -75,4 +96,15 @@ func ValidateIPAddress(c *gin.Context) {
 func ParseCidr(cidr string) (net.IP, *net.IPNet, error) {
 	ip, n, err := net.ParseCIDR(cidr)
 	return ip, n, err
+}
+
+func CheckPort(port string) error {
+	portNum, err := strconv.Atoi(port)
+	if err != nil {
+		return fmt.Errorf("invalid port number: %s", port)
+	}
+	if portNum < 1 || portNum > 65535 {
+		return fmt.Errorf("port number out of range: %d", portNum)
+	}
+	return nil
 }

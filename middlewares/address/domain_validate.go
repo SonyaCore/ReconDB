@@ -33,13 +33,27 @@ func ValidateSingleDomain(c *gin.Context) {
 	}
 
 	if strings.ToLower(Scope.ScopeType) == "single" {
+		if strings.Contains(Scope.Scope, ":") {
+			parts := strings.Split(Scope.Scope, ":")
+			port := parts[1]
+			if err := CheckPort(port); err != nil {
+				c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
+					"input":  Scope.Scope,
+					"error":  err.Error(),
+					"status": http.StatusNotAcceptable,
+				})
+				return
+			}
+			c.Next()
+			return
+		}
+
 		if !ValidateDomainName(Scope.Scope) {
-			c.JSON(http.StatusNotAcceptable, gin.H{
+			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 				"input":  Scope.Scope,
 				"error":  fmt.Sprintf("domain Name %s is invalid", Scope.Scope),
 				"status": http.StatusNotAcceptable,
 			})
-			c.Abort()
 			return
 		}
 		c.Next()
