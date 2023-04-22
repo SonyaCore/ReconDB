@@ -86,8 +86,8 @@ func DeleteCompany(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"CompanyName":  Param,
-		"DeletedCount": filter.DeletedCount,
-		"status":       http.StatusOK,
+		"company_name":  Param,
+		"deleted_count": filter.DeletedCount,
+		"status":        http.StatusOK,
 	})
 }

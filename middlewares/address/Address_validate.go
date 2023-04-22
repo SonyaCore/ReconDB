@@ -56,26 +56,7 @@ func ValidateIPAddress(c *gin.Context) {
 
 	if strings.ToLower(Scope.ScopeType) == "ip" {
 		if strings.Contains(Scope.Scope, ":") {
-			parts := strings.Split(Scope.Scope, ":")
-			ip := parts[0]
-			port := parts[1]
-			if err := CheckIPAddress(ip); err != nil {
-				c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
-					"input":  Scope.Scope,
-					"error":  err.Error(),
-					"status": http.StatusNotAcceptable,
-				})
-				return
-			}
-			if err := CheckPort(port); err != nil {
-				c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
-					"input":  Scope.Scope,
-					"error":  err.Error(),
-					"status": http.StatusNotAcceptable,
-				})
-				return
-			}
-			c.Next()
+			validateIpPort(c, Scope)
 			return
 		}
 
@@ -91,6 +72,30 @@ func ValidateIPAddress(c *gin.Context) {
 		return
 	}
 	c.Next()
+}
+
+func validateIpPort(c *gin.Context, Scope models.Scopes) {
+	parts := strings.Split(Scope.Scope, ":")
+	ip := parts[0]
+	port := parts[1]
+	if err := CheckIPAddress(ip); err != nil {
+		c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
+			"input":  Scope.Scope,
+			"error":  err.Error(),
+			"status": http.StatusNotAcceptable,
+		})
+		return
+	}
+	if err := CheckPort(port); err != nil {
+		c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
+			"input":  Scope.Scope,
+			"error":  err.Error(),
+			"status": http.StatusNotAcceptable,
+		})
+		return
+	}
+	c.Next()
+	return
 }
 
 func ParseCidr(cidr string) (net.IP, *net.IPNet, error) {

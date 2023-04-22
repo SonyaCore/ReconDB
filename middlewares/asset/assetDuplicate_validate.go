@@ -38,14 +38,14 @@ func DuplicateValidate(c *gin.Context) {
 	count, collectionError := database.CountDocuments("Assets", assetQuery)
 	if collectionError != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"error":  "failed to count documents in Assets collection",
+			"error":  "Failed to count documents in Assets collection",
 			"status": http.StatusInternalServerError,
 		})
 		return
 	}
 	if count > 0 {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error":  "duplicate entry",
+			"error":  "Duplicate entry",
 			"input":  Asset.Asset,
 			"status": http.StatusBadRequest,
 		})

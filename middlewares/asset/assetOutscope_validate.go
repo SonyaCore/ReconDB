@@ -43,6 +43,7 @@ func OutScopeAssetValidate(c *gin.Context) {
 	// find company name based on scope
 	scopeQuery := bson.M{
 		//"scopetype": Asset.AssetType,
+
 		"scope": Asset.Scope,
 	}
 
@@ -54,7 +55,7 @@ func OutScopeAssetValidate(c *gin.Context) {
 
 	if err = collectionScope.FindOne(context.Background(), scopeQuery, opts).Decode(&scopeResult); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error":  "company name not found in scope",
+			"error":  "Company Name not found in Scope",
 			"status": http.StatusBadRequest,
 		})
 		return
@@ -73,8 +74,9 @@ func OutScopeAssetValidate(c *gin.Context) {
 	}
 	if outOfScope > 0 {
 		c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
-			"error":  "Asset is out of scope",
-			"Asset":  Asset.Asset,
+			"error":  "Asset is out of Scope",
+			"asset":  Asset.Asset,
+			"scope":  Asset.Scope,
 			"status": http.StatusNotAcceptable,
 		})
 		return
@@ -94,8 +96,9 @@ func OutScopeAssetValidate(c *gin.Context) {
 		}
 		if outOfScopeWildCard > 0 {
 			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
-				"error":  "Asset is out of scope",
-				"Asset":  Asset.Asset,
+				"error":  "Asset is out of Scope",
+				"asset":  Asset.Asset,
+				"scope":  Asset.Scope,
 				"status": http.StatusNotAcceptable,
 			})
 			return

@@ -11,7 +11,7 @@ import (
 	"net/http"
 )
 
-func CompanyValidate(c *gin.Context) {
+func Validate(c *gin.Context) {
 	var Company models.Company
 	var results int64
 
@@ -33,7 +33,7 @@ func CompanyValidate(c *gin.Context) {
 	if results >= 1 {
 		c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 			"company": Company.CompanyName,
-			"result":  "duplicate entry",
+			"result":  "Duplicate Entry",
 			"status":  http.StatusNotAcceptable,
 		})
 		return

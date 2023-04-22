@@ -46,7 +46,7 @@ func ValidateScopes(c *gin.Context) {
 		continue
 	}
 	c.JSON(http.StatusFailedDependency, gin.H{
-		"error":       "scope type is not valid",
+		"error":       "Scope Type is not valid",
 		"valid_types": middlewares.Scopes,
 		"status":      http.StatusFailedDependency,
 	})
@@ -96,7 +96,7 @@ func OutScopeCheck(c *gin.Context) {
 		if results >= 1 {
 			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 				"input":  Scope.Scope,
-				"result": "duplicate entry",
+				"result": "Duplicate Entry",
 				"status": http.StatusNotAcceptable,
 			})
 			return
@@ -112,7 +112,7 @@ func OutScopeCheck(c *gin.Context) {
 		if c.Request.RequestURI == outScopeUri {
 			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 				"companyname": Scope.CompanyName,
-				"result":      "duplicate entry",
+				"result":      "Duplicate Entry",
 				"status":      http.StatusNotAcceptable,
 			})
 			return
@@ -120,7 +120,7 @@ func OutScopeCheck(c *gin.Context) {
 
 		c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 			"scope":  Scope.Scope,
-			"result": "out of scope",
+			"result": "Out of Scope",
 			"status": http.StatusNotAcceptable,
 		})
 		return

@@ -28,7 +28,7 @@ func AddOutScope(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"collectionID": result.InsertedID,
-		"message":      "out of scope added",
+		"message":      "Out of Scope Added",
 		"result":       Scope,
 		"status":       http.StatusOK,
 	})
@@ -70,8 +70,8 @@ func GetOutofScopes(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"Results": OutofScopes,
-		"Status":  http.StatusOK,
+		"results": OutofScopes,
+		"status":  http.StatusOK,
 	})
 }
 
@@ -86,8 +86,8 @@ func DeleteOutofScopes(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"CompanyName":  Param,
-		"DeletedCount": filter.DeletedCount,
-		"Status":       http.StatusOK,
+		"company_name":  Param,
+		"deleted_count": filter.DeletedCount,
+		"status":        http.StatusOK,
 	})
 }

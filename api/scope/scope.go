@@ -28,7 +28,7 @@ func AddScope(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"collectionID": result.InsertedID,
-		"message":      "scope added",
+		"message":      "Scope Added",
 		"result":       Scope,
 		"status":       http.StatusOK,
 	})
@@ -86,8 +86,8 @@ func DeleteScopes(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"CompanyName":  Param,
-		"DeletedCount": filter.DeletedCount,
-		"Status":       http.StatusOK,
+		"scope":         Param,
+		"deleted_count": filter.DeletedCount,
+		"status":        http.StatusOK,
 	})
 }

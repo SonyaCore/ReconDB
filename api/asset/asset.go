@@ -18,7 +18,7 @@ func AddAsset(c *gin.Context) {
 	// Bind the JSON data to the Asset struct
 	if err = c.ShouldBindJSON(&asset); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error":  "invalid request",
+			"error":  "Invalid Request",
 			"status": http.StatusBadRequest,
 		})
 		return
@@ -47,7 +47,7 @@ func AddAsset(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"collectionID": result.InsertedID,
-		"message":      "asset added",
+		"message":      "Asset Added",
 		"result":       asset,
 		"status":       http.StatusOK,
 	})
@@ -105,8 +105,8 @@ func DeleteAsset(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"AssetName":    Param,
-		"DeletedCount": filter.DeletedCount,
-		"status":       http.StatusOK,
+		"asset_name":    Param,
+		"deleted_count": filter.DeletedCount,
+		"status":        http.StatusOK,
 	})
 }

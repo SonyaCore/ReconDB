@@ -55,7 +55,7 @@ func RegisterRouter(router *gin.Engine) {
 
 		// company router
 		api.POST("/company", auth.CheckAuth, companyMiddleware.ProgramType,
-			companyMiddleware.CompanyValidate, company.AddCompany)
+			companyMiddleware.Validate, company.AddCompany)
 
 		api.GET("/company/:companyname", auth.CheckAuth, company.GetCompany)
 		api.GET("/company", auth.CheckAuth, company.GetAllCompanies)
