@@ -88,7 +88,7 @@ func AddAsset(c *gin.Context) {
 		return
 	}
 
-	// Check if the asset is in the out of scope collection
+	// Check if the asset is in the out-of-scope collection
 	outOfScopeQuery := bson.M{
 		"companyname": results.CompanyName,
 		"scopetype":   asset.AssetType,
