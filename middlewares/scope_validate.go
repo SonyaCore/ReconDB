@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -18,6 +17,7 @@ import (
 )
 
 var scopeUri = "/api/scope"
+var outScopeUri = "/api/outscope"
 
 func ValidateScopes(c *gin.Context) {
 	var Scope models.Scopes
@@ -88,6 +88,22 @@ func OutScopeCheck(c *gin.Context) {
 
 	// only use this section if request uri was /api/scope
 	if c.Request.RequestURI == scopeUri {
+		collection = database.Collection("Company")
+		companyQuery := bson.M{
+			"companyname": Scope.CompanyName,
+		}
+
+		results, err = collection.CountDocuments(ctx, companyQuery)
+		if results == 0 {
+			c.JSON(http.StatusNotAcceptable, gin.H{
+				"input":  Scope.Scope,
+				"result": "scope are not registerd in company",
+				"status": http.StatusNotAcceptable,
+			})
+			c.Abort()
+			return
+		}
+
 		collection = database.Collection("Scopes")
 		results, err = collection.CountDocuments(ctx, ScopeQuery)
 
@@ -109,9 +125,8 @@ func OutScopeCheck(c *gin.Context) {
 		log.Print(err.Error())
 	}
 
-	fmt.Println("document count", results)
 	if results >= 1 {
-		if c.Request.RequestURI == "/api/outscope" {
+		if c.Request.RequestURI == outScopeUri {
 			c.JSON(http.StatusNotAcceptable, gin.H{
 				"companyname": Scope.CompanyName,
 				"result":      "duplicate entry",
@@ -120,6 +135,7 @@ func OutScopeCheck(c *gin.Context) {
 			c.Abort()
 			return
 		}
+
 		c.JSON(http.StatusNotAcceptable, gin.H{
 			"scope":  Scope.Scope,
 			"result": "out of scope",
