@@ -4,7 +4,6 @@ import (
 	"ReconDB/models"
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
 	"log"
@@ -33,7 +32,6 @@ func ProgramType(c *gin.Context) {
 
 	for i, _ := range ProgramTypes {
 		if strings.ToLower(Company.ProgramType) == ProgramTypes[i] {
-			fmt.Println("valid")
 			c.Next()
 			return
 		}

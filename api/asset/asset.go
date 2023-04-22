@@ -4,7 +4,6 @@ import (
 	"ReconDB/database"
 	"ReconDB/models"
 	"context"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -70,7 +69,6 @@ func AddAsset(c *gin.Context) {
 
 	// Check if the asset is already in the Asset collection
 	count, collectionError := database.Collection("Assets").CountDocuments(context.Background(), assetQuery)
-	fmt.Println(count)
 	if collectionError != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error":  "failed to count documents in Assets collection",

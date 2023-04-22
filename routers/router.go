@@ -31,7 +31,7 @@ func RegisterRouter(router *gin.Engine) {
 		api.DELETE("/outscope/:companyname", outscope.DeleteOutofScopes)
 
 		// company router
-		api.POST("/company", middlewares.ProgramType, company.AddCompany)
+		api.POST("/company", middlewares.ProgramType, middlewares.CompanyValidate, company.AddCompany)
 		api.GET("/company/:companyname", company.GetCompany)
 		api.GET("/company", company.GetAllCompanies)
 		api.DELETE("/company/:companyname", company.DeleteCompany)
