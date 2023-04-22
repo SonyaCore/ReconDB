@@ -13,7 +13,7 @@ import (
 
 // Program Info
 var (
-	version  = "0.6.1"
+	version  = "0.6.2"
 	build    = "Custom"
 	codename = "ReconDB , ReconDB Service."
 )
