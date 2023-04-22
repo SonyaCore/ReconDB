@@ -11,7 +11,7 @@ import (
 	"net/http"
 )
 
-func Validate(c *gin.Context) {
+func ValidateCompanyName(c *gin.Context) {
 	var Company models.Company
 	var results int64
 

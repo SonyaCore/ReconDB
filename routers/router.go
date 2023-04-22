@@ -25,49 +25,61 @@ func ChainMiddleware(handlers ...gin.HandlerFunc) gin.HandlerFunc {
 }
 
 // AddressMiddleWare used to validate host input from client
-//var AddressMiddleWare = ChainMiddleware(address.ValidateSingleDomain, address.ValidateWildCard,
+//var AddressMiddleWare = alice.new(address.ValidateSingleDomain, address.ValidateWildCard,
 //	address.ValidateIPAddress)
 
 // CompanyMiddleWare validate company duplication and program type
 //var CompanyMiddleWare = ChainMiddleware(companyMiddleware.ProgramType, companyMiddleware.CompanyValidate)
 
 func RegisterRouter(router *gin.Engine) {
-
 	api := router.Group("/api")
 	{
 		// scope router
-		api.POST("/scope", auth.CheckAuth, address.ValidateSingleDomain, address.ValidateWildCard,
+		api.POST("/scope", auth.CheckAuth,
+			address.ValidateSingleDomain,
+			address.ValidateWildCard,
 			address.ValidateIPAddress,
-			scopeMiddleware.OutScopeCheck, scopeMiddleware.ValidateScopes, scope.AddScope)
+			scopeMiddleware.OutScopeCheck,
+			scopeMiddleware.ValidateScopes,
+
+			scope.AddScope)
 
 		api.GET("/scope/:companyname", auth.CheckAuth, scope.GetScopes)
 		api.GET("/scope", auth.CheckAuth, scope.GetAllScopes)
 		api.DELETE("/scope/:companyname", auth.CheckAuth, scope.DeleteScopes)
 
 		// out of scopes router
-		api.POST("/outscope", auth.CheckAuth, address.ValidateSingleDomain, address.ValidateWildCard,
+		api.POST("/outscope", auth.CheckAuth,
+			address.ValidateSingleDomain,
+			address.ValidateWildCard,
 			address.ValidateIPAddress,
-			scopeMiddleware.ValidateScopes, scopeMiddleware.OutScopeCheck, outscope.AddOutScope)
+			scopeMiddleware.ValidateScopes,
+			scopeMiddleware.OutScopeCheck,
+			outscope.AddOutScope)
 
 		api.GET("/outscope/:companyname", auth.CheckAuth, outscope.GetOutofScopes)
 		api.GET("/outscope", auth.CheckAuth, outscope.GetAllOutofScopes)
 		api.DELETE("/outscope/:companyname", auth.CheckAuth, outscope.DeleteOutofScopes)
 
 		// company router
-		api.POST("/company", auth.CheckAuth, companyMiddleware.ProgramType,
-			companyMiddleware.Validate, company.AddCompany)
+		api.POST("/company", auth.CheckAuth,
+			companyMiddleware.ProgramType,
+			companyMiddleware.ValidateCompanyName,
+			company.AddCompany)
 
 		api.GET("/company/:companyname", auth.CheckAuth, company.GetCompany)
 		api.GET("/company", auth.CheckAuth, company.GetAllCompanies)
 		api.DELETE("/company/:companyname", auth.CheckAuth, company.DeleteCompany)
 
 		// asset router
-		api.POST("/asset", auth.CheckAuth, assetMiddleware.DuplicateValidate, assetMiddleware.OutScopeAssetValidate,
+		api.POST("/asset", auth.CheckAuth,
+			assetMiddleware.DuplicateValidate,
+			assetMiddleware.OutScopeAssetValidate,
 			asset.AddAsset)
 
 		api.GET("/asset/:asset", auth.CheckAuth, asset.GetAsset)
 		api.GET("/asset", auth.CheckAuth, asset.GetAllAssets)
-		api.DELETE("/asset/:asset", auth.CheckAuth, asset.DeleteAsset)
+		api.DELETE("/asset/:scope", auth.CheckAuth, asset.DeleteAsset)
 
 	}
 }

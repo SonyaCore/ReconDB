@@ -1,14 +1,13 @@
 package address
 
 import (
-	"ReconDB/middlewares"
 	"ReconDB/models"
 	"ReconDB/pkg/buffer"
+	"ReconDB/pkg/check"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	"regexp"
 	"strings"
 )
 
@@ -33,7 +32,7 @@ func ValidateWildCard(c *gin.Context) {
 			})
 		}
 
-		if WildCardRegex(Scope.Scope) {
+		if check.WildCardRegex(Scope.Scope) {
 			c.Next()
 			return
 		}
@@ -46,12 +45,4 @@ func ValidateWildCard(c *gin.Context) {
 	}
 
 	c.Next()
-}
-
-func WildCardRegex(query string) bool {
-	regex := regexp.MustCompile(middlewares.WildCardPattern)
-	if regex.MatchString(query) {
-		return true
-	}
-	return false
 }

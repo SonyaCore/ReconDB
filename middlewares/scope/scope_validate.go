@@ -19,6 +19,10 @@ import (
 var scopeUri = "/api/scope"
 var outScopeUri = "/api/outscope"
 
+// errors
+var CompanyNotRegister = "Scope are not registered for this company"
+var DuplicateEntry = "Duplicate Entry"
+
 func ValidateScopes(c *gin.Context) {
 	var Scope models.Scopes
 
@@ -85,8 +89,8 @@ func OutScopeCheck(c *gin.Context) {
 		results, err = database.CountDocuments("Company", companyQuery)
 		if results == 0 {
 			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
-				"input":  Scope.Scope,
-				"result": "Scope is not registered for this company.",
+				"input":  Scope.CompanyName,
+				"result": CompanyNotRegister,
 				"status": http.StatusNotAcceptable,
 			})
 			return
@@ -109,18 +113,19 @@ func OutScopeCheck(c *gin.Context) {
 	}
 
 	if results >= 1 {
-		if c.Request.RequestURI == outScopeUri {
+		if c.Request.RequestURI == scopeUri {
 			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 				"companyname": Scope.CompanyName,
-				"result":      "Duplicate Entry",
+				"result":      "Out of Scope",
 				"status":      http.StatusNotAcceptable,
 			})
 			return
 		}
 
+		// scope uri
 		c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 			"scope":  Scope.Scope,
-			"result": "Out of Scope",
+			"result": DuplicateEntry,
 			"status": http.StatusNotAcceptable,
 		})
 		return

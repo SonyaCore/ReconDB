@@ -4,6 +4,7 @@ import (
 	"ReconDB/middlewares"
 	"ReconDB/models"
 	"ReconDB/pkg/buffer"
+	"ReconDB/pkg/check"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -36,7 +37,7 @@ func ValidateSingleDomain(c *gin.Context) {
 		if strings.Contains(Scope.Scope, ":") {
 			parts := strings.Split(Scope.Scope, ":")
 			port := parts[1]
-			if err := CheckPort(port); err != nil {
+			if err := check.CheckPort(port); err != nil {
 				c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 					"input":  Scope.Scope,
 					"error":  err.Error(),
