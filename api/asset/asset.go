@@ -6,21 +6,17 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"net/http"
-	"regexp"
 )
 
 func AddAsset(c *gin.Context) {
 	var asset models.Assets
-	var results struct {
-		CompanyName string `bson:"companyname"`
-	}
+	var err error
 
 	// Bind the JSON data to the Asset struct
-	if err := c.ShouldBindJSON(&asset); err != nil {
+	if err = c.ShouldBindJSON(&asset); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":  "invalid request",
 			"status": http.StatusBadRequest,
@@ -30,17 +26,23 @@ func AddAsset(c *gin.Context) {
 	}
 
 	// Find the asset type of the given asset
-	asset.AssetType = FindAssetType(asset)
+	asset.AssetType, err = FindAssetType(asset)
+	if err != nil {
+		c.JSON(http.StatusFailedDependency, gin.H{
+			"error":  err.Error(),
+			"status": http.StatusFailedDependency,
+		})
+		c.Abort()
+		return
+	}
 
 	// Find the matching scope for the given asset
 	collectionScope := database.Collection("Scopes")
 
+	// find company name based on scope
 	scopeQuery := bson.M{
-		"scopetype": asset.AssetType,
-		"scope": primitive.Regex{
-			Pattern: "^" + regexp.QuoteMeta(asset.Asset) + "$",
-			Options: "i",
-		},
+		//"scopetype": asset.AssetType,
+		"scope": asset.Scope,
 	}
 
 	opts := options.FindOne().SetProjection(bson.M{"companyname": 1})
@@ -49,7 +51,7 @@ func AddAsset(c *gin.Context) {
 		CompanyName string `bson:"companyname"`
 	}
 
-	if err := collectionScope.FindOne(context.Background(), scopeQuery, opts).Decode(&scopeResult); err != nil {
+	if err = collectionScope.FindOne(context.Background(), scopeQuery, opts).Decode(&scopeResult); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":  "company name not found in scope",
 			"status": http.StatusBadRequest,
@@ -58,54 +60,17 @@ func AddAsset(c *gin.Context) {
 		return
 	}
 
-	// Define the query to find scopes for the given company name and asset type
-	assetQuery := bson.M{
-		"asset": primitive.Regex{
-			Pattern: "^" + regexp.QuoteMeta(asset.Asset) + "$",
-			Options: "i",
-		},
-		"islive": asset.IsLive,
-	}
-
-	// Check if the asset is already in the Asset collection
-	count, collectionError := database.Collection("Assets").CountDocuments(context.Background(), assetQuery)
-	if collectionError != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":  "failed to count documents in Assets collection",
-			"status": http.StatusInternalServerError,
-		})
-		c.Abort()
-		return
-	}
-
-	if count > 0 {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":  "duplicate entry",
-			"input":  asset.Asset,
-			"status": http.StatusBadRequest,
-		})
-		c.Abort()
-		return
-	}
-
 	// Check if the asset is in the out-of-scope collection
 	outOfScopeQuery := bson.M{
-		"companyname": results.CompanyName,
+		"companyname": scopeResult.CompanyName,
 		"scopetype":   asset.AssetType,
-		"scope": bson.M{
-			"$regex": primitive.Regex{
-				Pattern: "^" + regexp.QuoteMeta(asset.Asset) + "$",
-				Options: "i",
-			},
-		},
+		"scope":       asset.Asset,
 	}
 
 	var outOfScope int64
-	var err error
-	if outOfScope, err = database.Collection("OutofScopes").CountDocuments(context.Background(), outOfScopeQuery); err != nil {
+	if outOfScope, err = database.CountDocuments("OutofScopes", outOfScopeQuery); err != nil {
 		outOfScope = 0
 	}
-
 	if outOfScope > 0 {
 		c.JSON(http.StatusNotAcceptable, gin.H{
 			"error":  "asset is out of scope",

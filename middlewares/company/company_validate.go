@@ -1,50 +1,35 @@
-package middlewares
+package company
 
 import (
 	"ReconDB/database"
 	"ReconDB/models"
-	"bytes"
-	"context"
+	"ReconDB/pkg/buffer"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"io"
 	"log"
 	"net/http"
 )
 
 func CompanyValidate(c *gin.Context) {
 	var Company models.Company
-	var ctx = context.TODO()
+	var results int64
 
-	// Read the content
-	rawBody, err := io.ReadAll(c.Request.Body)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, rawBody)
-	}
+	rawBody, err := buffer.ReadBuffer(c)
 
-	// Unmarshal rawBody to Scope
+	// Unmarshal rawBody to Company
 	err = json.Unmarshal(rawBody, &Company)
 	if err != nil {
 		log.Printf(err.Error())
 		return
 	}
 
-	// Restore the io.ReadCloser to its original state
-	c.Request.Body = io.NopCloser(bytes.NewBuffer(rawBody))
-
 	companyQuery := bson.M{
 		"companyname": Company.CompanyName,
-		"programtype": Company.ProgramType,
+		//"programtype": Company.ProgramType,
 	}
 
-	var collection *mongo.Collection
-	var results int64
-
-	collection = database.Collection("Company")
-	results, err = collection.CountDocuments(ctx, companyQuery)
-
+	results, err = database.CountDocuments("Company", companyQuery)
 	if results >= 1 {
 		c.JSON(http.StatusNotAcceptable, gin.H{
 			"company": Company.CompanyName,
@@ -54,6 +39,5 @@ func CompanyValidate(c *gin.Context) {
 		c.Abort()
 		return
 	}
-
 	c.Next()
 }

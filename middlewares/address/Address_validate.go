@@ -1,12 +1,11 @@
-package middlewares
+package address
 
 import (
 	"ReconDB/models"
-	"bytes"
+	"ReconDB/pkg/buffer"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"io"
 	"log"
 	"net"
 	"net/http"
@@ -15,7 +14,6 @@ import (
 
 func CheckIPAddress(ip string) error {
 	if net.ParseIP(ip) == nil {
-
 		return fmt.Errorf("invalid IP Address: %s", ip)
 	}
 	return nil
@@ -24,14 +22,7 @@ func CheckIPAddress(ip string) error {
 func ValidateIPAddress(c *gin.Context) {
 	var Scope models.Scopes
 
-	// Read the content
-	rawBody, err := io.ReadAll(c.Request.Body)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, rawBody)
-	}
-
-	// Restore the io.ReadCloser to its original state
-	c.Request.Body = io.NopCloser(bytes.NewBuffer(rawBody))
+	rawBody, err := buffer.ReadBuffer(c)
 
 	// Unmarshal rawBody to Scope
 	err = json.Unmarshal(rawBody, &Scope)
@@ -54,7 +45,7 @@ func ValidateIPAddress(c *gin.Context) {
 
 		if !n.IP.Equal(ip) {
 			c.JSON(http.StatusNotAcceptable, gin.H{
-				"error":  fmt.Errorf("got %s; want %v\n", Scope.Scope, n),
+				"error":  fmt.Sprintf("got %s; want %v\n", Scope.Scope, n),
 				"status": http.StatusNotAcceptable,
 			})
 			c.Abort()

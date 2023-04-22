@@ -5,7 +5,11 @@ import (
 	"ReconDB/api/company"
 	"ReconDB/api/outscope"
 	"ReconDB/api/scope"
-	"ReconDB/middlewares"
+	"ReconDB/middlewares/address"
+	assetMiddleware "ReconDB/middlewares/asset"
+	auth "ReconDB/middlewares/auth"
+	companyMiddleware "ReconDB/middlewares/company"
+	scopeMiddleware "ReconDB/middlewares/scope"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,41 +24,44 @@ func ChainMiddleware(handlers ...gin.HandlerFunc) gin.HandlerFunc {
 	}
 }
 
-func RegisterRouter(router *gin.Engine) {
-	AddressMiddleWare := ChainMiddleware(middlewares.ValidateSingleDomain, middlewares.ValidateWildCard,
-		middlewares.ValidateIPAddress)
+// AddressMiddleWare used to validate host input from client
+var AddressMiddleWare = ChainMiddleware(address.ValidateSingleDomain, address.ValidateWildCard,
+	address.ValidateIPAddress)
 
-	CompanyMiddleWare := ChainMiddleware(middlewares.ProgramType, middlewares.CompanyValidate)
+// CompanyMiddleWare validate company duplication and program type
+//var CompanyMiddleWare = ChainMiddleware(companyMiddleware.ProgramType, companyMiddleware.CompanyValidate)
+
+func RegisterRouter(router *gin.Engine) {
 
 	api := router.Group("/api")
 	{
 		// scope router
-		api.POST("/scope", AddressMiddleWare,
-			middlewares.OutScopeCheck, middlewares.ValidateScopes, scope.AddScope)
+		api.POST("/scope", auth.CheckAuth, AddressMiddleWare,
+			scopeMiddleware.OutScopeCheck, scopeMiddleware.ValidateScopes, scope.AddScope)
 
-		api.GET("/scope/:companyname", scope.GetScopes)
-		api.GET("/scope", scope.GetAllScopes)
-		api.DELETE("/scope/:companyname", scope.DeleteScopes)
+		api.GET("/scope/:companyname", auth.CheckAuth, scope.GetScopes)
+		api.GET("/scope", auth.CheckAuth, scope.GetAllScopes)
+		api.DELETE("/scope/:companyname", auth.CheckAuth, scope.DeleteScopes)
 
 		// out of scopes router
-		api.POST("/outscope", AddressMiddleWare,
-			middlewares.ValidateScopes, middlewares.OutScopeCheck, outscope.AddOutScope)
+		api.POST("/outscope", auth.CheckAuth, AddressMiddleWare,
+			scopeMiddleware.ValidateScopes, scopeMiddleware.OutScopeCheck, outscope.AddOutScope)
 
-		api.GET("/outscope/:companyname", outscope.GetOutofScopes)
-		api.GET("/outscope", outscope.GetAllOutofScopes)
-		api.DELETE("/outscope/:companyname", outscope.DeleteOutofScopes)
+		api.GET("/outscope/:companyname", auth.CheckAuth, outscope.GetOutofScopes)
+		api.GET("/outscope", auth.CheckAuth, outscope.GetAllOutofScopes)
+		api.DELETE("/outscope/:companyname", auth.CheckAuth, outscope.DeleteOutofScopes)
 
 		// company router
-		api.POST("/company", CompanyMiddleWare, company.AddCompany)
-		api.GET("/company/:companyname", company.GetCompany)
-		api.GET("/company", company.GetAllCompanies)
-		api.DELETE("/company/:companyname", company.DeleteCompany)
+		api.POST("/company", auth.CheckAuth, companyMiddleware.ProgramType, companyMiddleware.CompanyValidate, company.AddCompany)
+		api.GET("/company/:companyname", auth.CheckAuth, company.GetCompany)
+		api.GET("/company", auth.CheckAuth, company.GetAllCompanies)
+		api.DELETE("/company/:companyname", auth.CheckAuth, company.DeleteCompany)
 
 		// asset router
-		api.POST("/asset", asset.AddAsset)
-		api.GET("/asset/:asset", asset.GetAsset)
-		api.GET("/asset", asset.GetAllAssets)
-		api.DELETE("/asset/:asset", asset.DeleteAsset)
+		api.POST("/asset", auth.CheckAuth, assetMiddleware.DuplicateValidate, asset.AddAsset)
+		api.GET("/asset/:asset", auth.CheckAuth, asset.GetAsset)
+		api.GET("/asset", auth.CheckAuth, asset.GetAllAssets)
+		api.DELETE("/asset/:asset", auth.CheckAuth, asset.DeleteAsset)
 
 	}
 }

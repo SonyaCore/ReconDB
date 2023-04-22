@@ -1,26 +1,27 @@
 package asset
 
 import (
-	"ReconDB/middlewares"
+	"ReconDB/middlewares/address"
 	"ReconDB/models"
+	"fmt"
 )
 
-func FindAssetType(Asset models.Assets) string {
+func FindAssetType(Asset models.Assets) (string, error) {
 
-	if middlewares.ValidateDomainName(Asset.Asset) {
-		return "single"
+	if address.ValidateDomainName(Asset.Asset) {
+		return "single", nil
 	}
-	if middlewares.WildCardRegex(Asset.Asset) {
-		return "wildcard"
+	if address.WildCardRegex(Asset.Asset) {
+		return "wildcard", fmt.Errorf("wildcard are not allowed for asset")
 	}
-	if err := middlewares.CheckIPAddress(Asset.Asset); err == nil {
-		return "ip"
-	}
-
-	if _, _, err := middlewares.ParseCidr(Asset.Asset); err == nil {
-		return "cidr"
+	if err := address.CheckIPAddress(Asset.Asset); err == nil {
+		return "ip", nil
 	}
 
-	return ""
+	if _, _, err := address.ParseCidr(Asset.Asset); err == nil {
+		return "cidr", fmt.Errorf("cidr is not allowed for asset")
+	}
+
+	return "", fmt.Errorf("asset type not found")
 
 }

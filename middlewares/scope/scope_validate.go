@@ -1,15 +1,15 @@
-package middlewares
+package scope
 
 import (
 	"ReconDB/database"
+	"ReconDB/middlewares"
 	"ReconDB/models"
+	"ReconDB/pkg/buffer"
 	"bytes"
-	"context"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 	"io"
 	"log"
 	"net/http"
@@ -38,8 +38,8 @@ func ValidateScopes(c *gin.Context) {
 	// Restore the io.ReadCloser to its original state
 	c.Request.Body = io.NopCloser(bytes.NewBuffer(rawBody))
 
-	for i, _ := range Scopes {
-		if Scope.ScopeType == Scopes[i] {
+	for i, _ := range middlewares.Scopes {
+		if Scope.ScopeType == middlewares.Scopes[i] {
 			c.Next()
 			return
 		}
@@ -47,7 +47,7 @@ func ValidateScopes(c *gin.Context) {
 	}
 	c.JSON(http.StatusFailedDependency, gin.H{
 		"error":       "scope type is not valid",
-		"valid_types": Scopes,
+		"valid_types": middlewares.Scopes,
 		"status":      http.StatusFailedDependency,
 	})
 	c.Abort()
@@ -56,13 +56,9 @@ func ValidateScopes(c *gin.Context) {
 
 func OutScopeCheck(c *gin.Context) {
 	var Scope models.Scopes
-	var ctx = context.TODO()
+	var results int64
 
-	// Read the content
-	rawBody, err := io.ReadAll(c.Request.Body)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, rawBody)
-	}
+	rawBody, err := buffer.ReadBuffer(c)
 
 	// Unmarshal rawBody to Scope
 	err = json.Unmarshal(rawBody, &Scope)
@@ -70,9 +66,6 @@ func OutScopeCheck(c *gin.Context) {
 		log.Printf(err.Error())
 		return
 	}
-
-	// Restore the io.ReadCloser to its original state
-	c.Request.Body = io.NopCloser(bytes.NewBuffer(rawBody))
 
 	ScopeQuery := bson.M{
 		"companyname": Scope.CompanyName,
@@ -83,30 +76,24 @@ func OutScopeCheck(c *gin.Context) {
 		},
 	}
 
-	var collection *mongo.Collection
-	var results int64
-
 	// only use this section if request uri was /api/scope
 	if c.Request.RequestURI == scopeUri {
-		collection = database.Collection("Company")
 		companyQuery := bson.M{
 			"companyname": Scope.CompanyName,
 		}
 
-		results, err = collection.CountDocuments(ctx, companyQuery)
+		results, err = database.CountDocuments("Company", companyQuery)
 		if results == 0 {
 			c.JSON(http.StatusNotAcceptable, gin.H{
 				"input":  Scope.Scope,
-				"result": "scope are not registerd in company",
+				"result": "Scope is not registered for this company.",
 				"status": http.StatusNotAcceptable,
 			})
 			c.Abort()
 			return
 		}
 
-		collection = database.Collection("Scopes")
-		results, err = collection.CountDocuments(ctx, ScopeQuery)
-
+		results, err = database.CountDocuments("Scopes", ScopeQuery)
 		if results >= 1 {
 			c.JSON(http.StatusNotAcceptable, gin.H{
 				"input":  Scope.Scope,
@@ -116,11 +103,9 @@ func OutScopeCheck(c *gin.Context) {
 			c.Abort()
 			return
 		}
-
 	}
 
-	collection = database.Collection("OutofScopes")
-	results, err = collection.CountDocuments(ctx, ScopeQuery)
+	results, err = database.CountDocuments("OutofScopes", ScopeQuery)
 	if err != nil {
 		log.Print(err.Error())
 	}

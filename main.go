@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
+	"log"
 	"runtime"
 	"strings"
 )
@@ -38,7 +39,11 @@ func main() {
 	fmt.Println(VersionStatement())
 
 	// initial config file
-	config.LoadConfig(".")
+	_, err := config.LoadConfig(".")
+	if err != nil {
+		log.Fatal("config file not found")
+	}
+
 	PORT := viper.GetString("port")
 
 	// register gin engine

@@ -1,12 +1,12 @@
-package middlewares
+package address
 
 import (
+	"ReconDB/middlewares"
 	"ReconDB/models"
-	"bytes"
+	"ReconDB/pkg/buffer"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"io"
 	"log"
 	"net/http"
 	"regexp"
@@ -15,7 +15,7 @@ import (
 
 func ValidateDomainName(domain string) bool {
 
-	var RegExp = regexp.MustCompile(DomainPattern)
+	var RegExp = regexp.MustCompile(middlewares.DomainPattern)
 
 	return RegExp.MatchString(domain)
 }
@@ -23,14 +23,7 @@ func ValidateDomainName(domain string) bool {
 func ValidateSingleDomain(c *gin.Context) {
 	var Scope models.Scopes
 
-	// Read the content
-	rawBody, err := io.ReadAll(c.Request.Body)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, rawBody)
-	}
-
-	// Restore the io.ReadCloser to its original state
-	c.Request.Body = io.NopCloser(bytes.NewBuffer(rawBody))
+	rawBody, err := buffer.ReadBuffer(c)
 
 	// Unmarshal rawBody to Scope
 	err = json.Unmarshal(rawBody, &Scope)

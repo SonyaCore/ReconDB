@@ -20,8 +20,6 @@ func Client() *mongo.Client {
 		log.Fatal(err)
 	}
 
-	//collection = client.Database("ReconDB").Collection("scopes")
-
 	return client
 
 }

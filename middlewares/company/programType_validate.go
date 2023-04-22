@@ -1,11 +1,11 @@
-package middlewares
+package company
 
 import (
+	"ReconDB/middlewares"
 	"ReconDB/models"
-	"bytes"
+	"ReconDB/pkg/buffer"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -14,11 +14,7 @@ import (
 func ProgramType(c *gin.Context) {
 	var Company models.Company
 
-	// Read the content
-	rawBody, err := io.ReadAll(c.Request.Body)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, rawBody)
-	}
+	rawBody, err := buffer.ReadBuffer(c)
 
 	// Unmarshal rawBody to Company
 	err = json.Unmarshal(rawBody, &Company)
@@ -27,22 +23,19 @@ func ProgramType(c *gin.Context) {
 		return
 	}
 
-	// Restore the io.ReadCloser to its original state
-	c.Request.Body = io.NopCloser(bytes.NewBuffer(rawBody))
-
-	for i, _ := range ProgramTypes {
-		if strings.ToLower(Company.ProgramType) == ProgramTypes[i] {
+	for i, _ := range middlewares.ProgramTypes {
+		if strings.ToLower(Company.ProgramType) == middlewares.ProgramTypes[i] {
 			c.Next()
 			return
 		}
 		continue
 	}
+
 	c.JSON(http.StatusFailedDependency, gin.H{
 		"error":       "program type is not valid",
-		"valid_types": ProgramTypes,
+		"valid_types": middlewares.ProgramTypes,
 		"status":      http.StatusFailedDependency,
 	})
 	c.Abort()
 	return
-
 }
