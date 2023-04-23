@@ -48,7 +48,7 @@ func ValidateIPAddress(c *gin.Context) {
 	}
 
 	if strings.ToLower(Scope.ScopeType) == "ip" {
-		if !check.CheckIPAddress(Scope.Scope) {
+		if !check.IpAddress(Scope.Scope) {
 			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 				"input":  Scope.Scope,
 				"error":  fmt.Sprintf("invalid IP Address: %s", Scope.Scope),

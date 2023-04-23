@@ -14,7 +14,7 @@ func FindAssetType(Asset models.Assets) (string, error) {
 		return "single", nil
 	}
 
-	if check.CheckIPAddress(Asset.Asset) {
+	if check.IpAddress(Asset.Asset) {
 		return "ip", nil
 	}
 

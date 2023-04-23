@@ -7,6 +7,7 @@ import (
 	"ReconDB/pkg/buffer"
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -16,14 +17,14 @@ import (
 	"regexp"
 )
 
-var scopeUri = "/api/scope"
-var outScopeUri = "/api/outscope"
+const scopeUri = "/api/scope"
+const outScopeUri = "/api/outscope"
 
 // errors
 var CompanyNotRegister = "Scope are not registered for this company"
 var DuplicateEntry = "Duplicate Entry"
 
-func ValidateScopes(c *gin.Context) {
+func ValidateScopeType(c *gin.Context) {
 	var Scope models.Scopes
 
 	// Read the content
@@ -85,22 +86,19 @@ func OutScopeCheck(c *gin.Context) {
 		companyQuery := bson.M{
 			"companyname": Scope.CompanyName,
 		}
-
-		results, err = database.CountDocuments("Company", companyQuery)
-		if results == 0 {
+		results, err = CompanyCheck(companyQuery)
+		if err != nil {
 			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 				"input":  Scope.CompanyName,
-				"result": CompanyNotRegister,
+				"result": err.Error(),
 				"status": http.StatusNotAcceptable,
 			})
-			return
 		}
-
-		results, err = database.CountDocuments("Scopes", ScopeQuery)
-		if results >= 1 {
+		results, err = DuplicateCheck(ScopeQuery)
+		if err != nil {
 			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 				"input":  Scope.Scope,
-				"result": "Duplicate Entry",
+				"result": err.Error(),
 				"status": http.StatusNotAcceptable,
 			})
 			return
@@ -122,7 +120,7 @@ func OutScopeCheck(c *gin.Context) {
 			return
 		}
 
-		// scope uri
+		// outscope uri
 		c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 			"scope":  Scope.Scope,
 			"result": DuplicateEntry,
@@ -132,4 +130,27 @@ func OutScopeCheck(c *gin.Context) {
 	}
 
 	c.Next()
+}
+
+func CompanyCheck(query bson.M) (int64, error) {
+	count, err := database.CountDocuments("Company", query)
+	if err != nil {
+		return 0, err
+	}
+	if count == 0 {
+		return 0, fmt.Errorf(CompanyNotRegister)
+	}
+	return 1, nil
+}
+
+func DuplicateCheck(query bson.M) (int64, error) {
+	count, err := database.CountDocuments("Scopes", query)
+	if err != nil {
+		return 1, err
+	}
+	if count >= 1 {
+		return count, fmt.Errorf("duplicate Entry")
+	}
+
+	return 0, nil
 }

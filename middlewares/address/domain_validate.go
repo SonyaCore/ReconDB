@@ -37,7 +37,7 @@ func ValidateSingleDomain(c *gin.Context) {
 		if strings.Contains(Scope.Scope, ":") {
 			parts := strings.Split(Scope.Scope, ":")
 			port := parts[1]
-			if err := check.CheckPort(port); err != nil {
+			if err := check.Port(port); err != nil {
 				c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 					"input":  Scope.Scope,
 					"error":  err.Error(),

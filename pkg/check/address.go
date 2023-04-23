@@ -7,13 +7,13 @@ import (
 	"strings"
 )
 
-func CheckIPAddress(ip string) bool {
+func IpAddress(ip string) bool {
 	if strings.Contains(ip, ":") {
 		parts := strings.Split(ip, ":")
 		ip = parts[0]
 		port := parts[1]
 
-		err := CheckPort(port)
+		err := Port(port)
 		if err != nil {
 			return false
 		}
@@ -25,7 +25,7 @@ func CheckIPAddress(ip string) bool {
 	return true
 }
 
-func CheckPort(port string) error {
+func Port(port string) error {
 	portNum, err := strconv.Atoi(port)
 	if err != nil {
 		return fmt.Errorf("invalid port number: %s", port)

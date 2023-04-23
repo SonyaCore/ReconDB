@@ -40,8 +40,7 @@ func RegisterRouter(router *gin.Engine) {
 			address.ValidateWildCard,
 			address.ValidateIPAddress,
 			scopeMiddleware.OutScopeCheck,
-			scopeMiddleware.ValidateScopes,
-
+			scopeMiddleware.ValidateScopeType,
 			scope.AddScope)
 
 		api.GET("/scope/:companyname", auth.CheckAuth, scope.GetScopes)
@@ -53,7 +52,7 @@ func RegisterRouter(router *gin.Engine) {
 			address.ValidateSingleDomain,
 			address.ValidateWildCard,
 			address.ValidateIPAddress,
-			scopeMiddleware.ValidateScopes,
+			scopeMiddleware.ValidateScopeType,
 			scopeMiddleware.OutScopeCheck,
 			outscope.AddOutScope)
 
