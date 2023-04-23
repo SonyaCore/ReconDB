@@ -97,16 +97,31 @@ func GetAsset(c *gin.Context) {
 func DeleteAsset(c *gin.Context) {
 	var Param = c.Param("asset")
 	var ctx = context.TODO()
+	var message string
+	var deletedCount int64
 
 	collection := database.Collection("Assets")
+	// delete the asset with asset input
 	filter, err := collection.DeleteMany(ctx, bson.M{"asset": Param})
 	if err != nil {
 		log.Print(err.Error())
 	}
 
+	if filter.DeletedCount >= 1 {
+		message = "asset_name"
+		deletedCount = filter.DeletedCount
+	}
+	// delete the asset with scope
+	filter, _ = collection.DeleteMany(ctx, bson.M{"scope": Param})
+
+	if filter.DeletedCount >= 1 {
+		message = "scope_name"
+		deletedCount = filter.DeletedCount
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"asset_name":    Param,
-		"deleted_count": filter.DeletedCount,
+		message:         Param,
+		"deleted_count": deletedCount,
 		"status":        http.StatusOK,
 	})
 }
