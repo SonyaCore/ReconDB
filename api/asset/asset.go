@@ -95,11 +95,11 @@ func GetAsset(c *gin.Context) {
 }
 
 func DeleteAsset(c *gin.Context) {
-	var Param = c.Param("scope")
+	var Param = c.Param("asset")
 	var ctx = context.TODO()
 
 	collection := database.Collection("Assets")
-	filter, err := collection.DeleteMany(ctx, bson.M{"scope": Param})
+	filter, err := collection.DeleteMany(ctx, bson.M{"asset": Param})
 	if err != nil {
 		log.Print(err.Error())
 	}

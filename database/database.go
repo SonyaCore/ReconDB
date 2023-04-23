@@ -11,6 +11,9 @@ import (
 
 var Ctx = context.TODO()
 
+// Client
+// first it get the uri with mongo_uri value in configuration file
+// then it connect to database with mongo.Connect
 func Client() *mongo.Client {
 	var mongoUri = viper.GetString("mongo_uri")
 
@@ -24,6 +27,7 @@ func Client() *mongo.Client {
 
 }
 
+// Ping pinging mongodb connection
 func Ping(c *mongo.Client) {
 	err := c.Ping(Ctx, nil)
 	if err != nil {

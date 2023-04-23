@@ -24,6 +24,8 @@ const outScopeUri = "/api/outscope"
 var CompanyNotRegister = "Scope are not registered for this company"
 var DuplicateEntry = "Duplicate Entry"
 
+// ValidateScopeType check the type of scope with middlewares.Scopes
+// if it was not in scopes []string c.Abort with error message otherwise c.Next()
 func ValidateScopeType(c *gin.Context) {
 	var Scope models.Scopes
 

@@ -13,6 +13,11 @@ import (
 	"regexp"
 )
 
+// DuplicateValidate checks if an asset with the same asset name and scope already exists in the Assets collection.
+// it defines a query to find the asset in the collection.
+// If a document with the same asset name and scope exists, it aborts the request and returns a JSON
+// response with a Bad Request status code and an error message indicating a duplicate entry. Otherwise, it passes the
+// request to the next middleware in the chain using c.Next().
 func DuplicateValidate(c *gin.Context) {
 	var Asset models.Assets
 

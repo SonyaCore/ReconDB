@@ -11,6 +11,8 @@ import (
 	"net/http"
 )
 
+// ValidateCompanyName checks if there was any duplication in Company collection
+// if len results was more than 1 c.Abort with error message , otherwise c.Next()
 func ValidateCompanyName(c *gin.Context) {
 	var Company models.Company
 	var results int64

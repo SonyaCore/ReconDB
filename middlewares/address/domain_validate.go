@@ -14,6 +14,7 @@ import (
 	"strings"
 )
 
+// ValidateDomainName validates domain name with DomainPattern regex
 func ValidateDomainName(domain string) bool {
 
 	var RegExp = regexp.MustCompile(middlewares.DomainPattern)
@@ -21,6 +22,11 @@ func ValidateDomainName(domain string) bool {
 	return RegExp.MatchString(domain)
 }
 
+// ValidateSingleDomain validates a domain:port string using the ValidateDomainName function to
+// ensure that the domain is valid. It checks if the string is of the form "domain:port",
+// splits the domain and port using the ":" delimiter, and then checks the port for validity.
+// Finally, it calls ValidateDomainName to check the domain for validity as well. c.Next()
+// if the domain:port or domain string is valid, and c.Abort() otherwise.
 func ValidateSingleDomain(c *gin.Context) {
 	var Scope models.Scopes
 

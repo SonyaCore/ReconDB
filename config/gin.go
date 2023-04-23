@@ -12,6 +12,7 @@ var GinModes = []string{
 	"debug", "release",
 }
 
+// GinInit create an instance of gin.Engine and set the proper mode with gin_mode value in configuration file
 func GinInit() *gin.Engine {
 	var ginMode = viper.GetString("gin_mode")
 	if ginMode == "" || len(ginMode) <= 3 {

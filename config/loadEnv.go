@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// LoadConfig load the configuration file with viper package
 func LoadConfig(path string) (config Config, err error) {
 	viper.AddConfigPath(path)
 	viper.SetConfigName("config") // name of config file

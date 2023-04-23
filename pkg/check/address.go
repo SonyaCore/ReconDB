@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// IpAddress checks IpAddress and check the port if input contain ":" prefix.
 func IpAddress(ip string) bool {
 	if strings.Contains(ip, ":") {
 		parts := strings.Split(ip, ":")
@@ -25,6 +26,7 @@ func IpAddress(ip string) bool {
 	return true
 }
 
+// Port checks the valid port
 func Port(port string) error {
 	portNum, err := strconv.Atoi(port)
 	if err != nil {

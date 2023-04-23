@@ -7,6 +7,7 @@ import (
 	"net/http"
 )
 
+// ReadBuffer reads the buffer of c.Request.Body then restore the data of buffer to request body
 func ReadBuffer(c *gin.Context) ([]byte, error) {
 	rawBody, err := io.ReadAll(c.Request.Body)
 	if err != nil {

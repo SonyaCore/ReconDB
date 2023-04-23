@@ -11,6 +11,11 @@ import (
 	"strings"
 )
 
+// ValidateWildCard checks if the incoming request contains a valid wildcard scope in the request body.
+// If the scope type is "wildcard", it checks whether the scope contains the '*' character using strings.Contains,
+// and then validates the scope using a regular expression pattern check. If the scope is valid, it passes the request
+// to the next middleware in the chain using c.Next(). Otherwise, it aborts the request and returns a JSON response
+// indicating the error with a corresponding HTTP status code.
 func ValidateWildCard(c *gin.Context) {
 	var Scope models.Scopes
 

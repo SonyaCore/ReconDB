@@ -11,6 +11,7 @@ import (
 	"strings"
 )
 
+// ProgramType
 func ProgramType(c *gin.Context) {
 	var Company models.Company
 

@@ -16,6 +16,7 @@ import (
 	"strings"
 )
 
+// OutScopeAssetValidate checks for Scopes & OutofScope duplication
 func OutScopeAssetValidate(c *gin.Context) {
 	var Asset models.Assets
 

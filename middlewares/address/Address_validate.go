@@ -13,6 +13,7 @@ import (
 	"strings"
 )
 
+// ValidateIPAddress validates address in input if it was cidr or ip
 func ValidateIPAddress(c *gin.Context) {
 	var Scope models.Scopes
 
