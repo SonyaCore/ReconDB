@@ -1,16 +1,15 @@
 package asset
 
 import (
+	"ReconDB/api/asset"
 	"ReconDB/database"
 	"ReconDB/models"
 	"ReconDB/pkg/buffer"
 	"ReconDB/pkg/type"
-	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"net/http"
 	"strings"
@@ -38,33 +37,19 @@ func OutScopeAssetValidate(c *gin.Context) {
 		return
 	}
 
-	// Find the matching scope for the given Asset
-	collectionScope := database.Collection("Scopes")
-
-	// find company name based on scope
-	scopeQuery := bson.M{
-		//"scopetype": Asset.AssetType,
-
-		"scope": Asset.Scope,
-	}
-
-	opts := options.FindOne().SetProjection(bson.M{"companyname": 1})
-
-	var scopeResult struct {
-		CompanyName string `bson:"companyname"`
-	}
-
-	if err = collectionScope.FindOne(context.Background(), scopeQuery, opts).Decode(&scopeResult); err != nil {
+	// search for company name if none found return error
+	scopeResult, err := asset.FindCompanyName(Asset)
+	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error":  "Company Name not found in Scope",
 			"status": http.StatusBadRequest,
 		})
-		return
 	}
+	Asset.CompanyName = scopeResult
 
 	// Check if the Asset is in the out-of-scope collection for single type
 	outOfScopeQuery := bson.M{
-		"companyname": scopeResult.CompanyName,
+		"companyname": Asset.CompanyName,
 		"scopetype":   Asset.AssetType,
 		"scope":       Asset.Asset,
 	}
@@ -86,7 +71,7 @@ func OutScopeAssetValidate(c *gin.Context) {
 	if strings.Contains(Asset.Scope, "*") && outOfScope == 0 {
 		var outOfScopeWildCard int64
 		outOfScopeWildCardQuery := bson.M{
-			"companyname": scopeResult.CompanyName,
+			"companyname": Asset.CompanyName,
 			"scopetype":   "wildcard",
 			"scope":       Asset.Scope,
 		}

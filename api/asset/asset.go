@@ -34,6 +34,9 @@ func AddAsset(c *gin.Context) {
 		return
 	}
 
+	scopeResult, _ := FindCompanyName(asset)
+	asset.CompanyName = scopeResult
+
 	// Insert the asset to the Asset collection
 	collection := database.Collection("Assets")
 	result, err := collection.InsertOne(database.Ctx, asset)

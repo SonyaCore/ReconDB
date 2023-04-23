@@ -85,9 +85,13 @@ func DeleteScopes(c *gin.Context) {
 		log.Print(err.Error())
 	}
 
+	Assets := database.Collection("Assets")
+	deleteAssets, _ := Assets.DeleteMany(ctx, bson.M{"companyname": Param})
+
 	c.JSON(http.StatusOK, gin.H{
-		"scope":         Param,
-		"deleted_count": filter.DeletedCount,
-		"status":        http.StatusOK,
+		"scope":       Param,
+		"scope_count": filter.DeletedCount,
+		"asset_count": deleteAssets.DeletedCount,
+		"status":      http.StatusOK,
 	})
 }

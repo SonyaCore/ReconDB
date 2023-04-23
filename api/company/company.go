@@ -85,9 +85,24 @@ func DeleteCompany(c *gin.Context) {
 		log.Print(err.Error())
 	}
 
+	// deleting scopes related to company name
+	scope := database.Collection("Scopes")
+	deleteScopes, _ := scope.DeleteMany(ctx, bson.M{"companyname": Param})
+
+	// deleting out of scopes relate to company name
+	Outscope := database.Collection("OutofScopes")
+	deleteOutScopes, _ := Outscope.DeleteMany(ctx, bson.M{"companyname": Param})
+
+	// deleting assets relate to company name
+	Assets := database.Collection("Assets")
+	deleteAssets, _ := Assets.DeleteMany(ctx, bson.M{"companyname": Param})
+
 	c.JSON(http.StatusOK, gin.H{
-		"company_name":  Param,
-		"deleted_count": filter.DeletedCount,
-		"status":        http.StatusOK,
+		"company_name":    Param,
+		"deleted_count":   filter.DeletedCount,
+		"scopes_count":    deleteScopes.DeletedCount,
+		"out_Scope_count": deleteOutScopes.DeletedCount,
+		"assets_count":    deleteAssets.DeletedCount,
+		"status":          http.StatusOK,
 	})
 }
