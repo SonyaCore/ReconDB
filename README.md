@@ -78,14 +78,22 @@ import os
 os.urandom(32).hex()
 ```
 
-## Running the Project
-To run the project you have to first compile the program and then run the compiled binary.
+## Running Project
+
+### Getting the Latest Release
+You can get the latest release of ReconDB from [Releases](https://github.com/SonyaCore/ReconDB/releases) section
+
+Make sure to properly set configuration file and run MongoDB instance on your server
+
+### Compiling from Source
+Use the following command to compile the program and then run the compiled binary :
+
 ```bash
  go build -o ReconDB -ldflags "-s -w -buildid=" -buildvcs=false .
  ./ReconDB
 ```
 
-## Running the Project With Docker
+### Running the Project With Docker
 To run the project with docker , you can use the docker-compose file :
 ```bash
 docker-compose up -d
