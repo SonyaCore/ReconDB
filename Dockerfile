@@ -6,6 +6,7 @@ WORKDIR /app
 RUN useradd -u 10001 user \
     && mkdir /home/user \
     && chown -R user:user /home/user \
+    && chown -R user:user /app \
     && chmod 755 /home/user
 
 USER user
@@ -17,7 +18,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o ReconDB .
+RUN go build -o ReconDB -ldflags "-s -w -buildid=" -buildvcs=false .
 
 EXPOSE 8080
 
