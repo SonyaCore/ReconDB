@@ -1,0 +1,14 @@
+[Unit]
+Description="Recon DB Service"
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=<your_executable_file_path>
+Restart=always
+User=<your_user_name>
+Group=<your_group_name>
+WorkingDirectory=<your_working_directory>
+
+[Install]
+WantedBy=multi-user.target
