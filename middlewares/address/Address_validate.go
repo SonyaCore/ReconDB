@@ -49,10 +49,10 @@ func ValidateIPAddress(c *gin.Context) {
 	}
 
 	if strings.ToLower(Scope.ScopeType) == "ip" {
-		if !check.IpAddress(Scope.Scope) {
+		if err = check.IpAddress(Scope.Scope); err != nil {
 			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 				"input":  Scope.Scope,
-				"error":  fmt.Sprintf("invalid IP Address: %s", Scope.Scope),
+				"error":  err.Error(),
 				"status": http.StatusNotAcceptable,
 			})
 			return

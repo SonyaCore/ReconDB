@@ -4,9 +4,8 @@ import (
 	"ReconDB/middlewares"
 	"ReconDB/models"
 	"ReconDB/pkg/buffer"
-	"ReconDB/pkg/check"
+	"ReconDB/pkg/domain"
 	"encoding/json"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -40,25 +39,10 @@ func ValidateSingleDomain(c *gin.Context) {
 	}
 
 	if strings.ToLower(Scope.ScopeType) == "single" {
-		if strings.Contains(Scope.Scope, ":") {
-			parts := strings.Split(Scope.Scope, ":")
-			port := parts[1]
-			if err := check.Port(port); err != nil {
-				c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
-					"input":  Scope.Scope,
-					"error":  err.Error(),
-					"status": http.StatusNotAcceptable,
-				})
-				return
-			}
-			c.Next()
-			return
-		}
-
-		if !ValidateDomainName(Scope.Scope) {
+		if err = domain.CheckDomain(Scope.Scope); err != nil {
 			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 				"input":  Scope.Scope,
-				"error":  fmt.Sprintf("domain Name %s is invalid", Scope.Scope),
+				"error":  err.Error(),
 				"status": http.StatusNotAcceptable,
 			})
 			return

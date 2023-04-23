@@ -1,10 +1,11 @@
 package _type
 
 import (
-	"ReconDB/middlewares/address"
 	"ReconDB/models"
 	"ReconDB/pkg/check"
+	"ReconDB/pkg/domain"
 	"ReconDB/pkg/parser"
+	"ReconDB/pkg/wildcard"
 	"fmt"
 )
 
@@ -13,12 +14,12 @@ import (
 func FindAssetType(Asset models.Assets) (string, error) {
 
 	// domain
-	if address.ValidateDomainName(Asset.Asset) {
+	if err := domain.CheckDomain(Asset.Asset); err == nil {
 		return "single", nil
 	}
 
 	// ip
-	if check.IpAddress(Asset.Asset) {
+	if err := check.IpAddress(Asset.Asset); err == nil {
 		return "ip", nil
 	}
 
@@ -28,7 +29,7 @@ func FindAssetType(Asset models.Assets) (string, error) {
 	}
 
 	// wildcard
-	if check.WildCardRegex(Asset.Asset) {
+	if wildcard.Match(Asset.Scope, Asset.Asset) {
 		return "wildcard", fmt.Errorf("wildcard are not allowed for asset")
 	}
 

@@ -11,7 +11,8 @@ import (
 	"strings"
 )
 
-// ProgramType
+// ProgramType checks the input program type with defined ProgramTypes []string
+// if it not matches c.Abort with error else c.Next()
 func ProgramType(c *gin.Context) {
 	var Company models.Company
 

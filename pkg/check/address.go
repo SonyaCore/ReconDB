@@ -8,7 +8,7 @@ import (
 )
 
 // IpAddress checks IpAddress and check the port if input contain ":" prefix.
-func IpAddress(ip string) bool {
+func IpAddress(ip string) error {
 	if strings.Contains(ip, ":") {
 		parts := strings.Split(ip, ":")
 		ip = parts[0]
@@ -16,14 +16,13 @@ func IpAddress(ip string) bool {
 
 		err := Port(port)
 		if err != nil {
-			return false
+			return fmt.Errorf("%s", err.Error())
 		}
 	}
-
 	if net.ParseIP(ip) == nil {
-		return false
+		return fmt.Errorf("invalid IP Address: %s", ip)
 	}
-	return true
+	return nil
 }
 
 // Port checks the valid port

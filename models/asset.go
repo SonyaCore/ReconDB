@@ -1,14 +1,18 @@
 package models
 
 // Assets struct model for asset api
-// Scope is scope of the asset
-// Asset is current asset of the scope
-// AssetType dynamically allocates & there is no need for passing type to it
-// IsLive indicates that current asset is live or not
 type Assets struct {
-	Scope       string `json:"scope"`
-	Asset       string `json:"asset"`
+	// Scope is scope of the asset
+	Scope string `json:"scope"`
+
+	// Asset is current asset of the scope
+	Asset string `json:"asset"`
+
+	// AssetType dynamically allocates & there is no need for passing type to it
 	CompanyName string `json:"-"`
-	AssetType   string `json:"-"`
-	IsLive      bool   `json:"is_live"`
+
+	AssetType string `json:"-"`
+
+	// IsLive indicates that current asset is live or not
+	IsLive bool `json:"is_live"`
 }

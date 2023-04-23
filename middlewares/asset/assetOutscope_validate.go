@@ -6,7 +6,9 @@ import (
 	"ReconDB/models"
 	"ReconDB/pkg/buffer"
 	"ReconDB/pkg/type"
+	"ReconDB/pkg/wildcard"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -47,6 +49,14 @@ func OutScopeAssetValidate(c *gin.Context) {
 	}
 	Asset.CompanyName = scopeResult
 
+	if strings.Contains(Asset.Scope, "*") {
+		if !wildcard.Match(Asset.Scope, Asset.Asset) {
+			returnError(c, errors.New("asset is not valid in that scope"),
+				http.StatusNotAcceptable, Asset.Asset, Asset.Scope)
+			return
+		}
+	}
+
 	// Check if the Asset is in the out-of-scope collection for single type
 	outOfScopeQuery := bson.M{
 		"companyname": Asset.CompanyName,
@@ -59,12 +69,8 @@ func OutScopeAssetValidate(c *gin.Context) {
 		outOfScope = 0
 	}
 	if outOfScope > 0 {
-		c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
-			"error":  "Asset is out of Scope",
-			"asset":  Asset.Asset,
-			"scope":  Asset.Scope,
-			"status": http.StatusNotAcceptable,
-		})
+		returnError(c, errors.New("asset is out of Scope"),
+			http.StatusNotAcceptable, Asset.Asset, Asset.Scope)
 		return
 	}
 
@@ -81,15 +87,20 @@ func OutScopeAssetValidate(c *gin.Context) {
 			outOfScopeWildCard = 0
 		}
 		if outOfScopeWildCard > 0 {
-			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
-				"error":  "Asset is out of Scope",
-				"asset":  Asset.Asset,
-				"scope":  Asset.Scope,
-				"status": http.StatusNotAcceptable,
-			})
+			returnError(c, errors.New("asset is out of Scope"),
+				http.StatusNotAcceptable, Asset.Asset, Asset.Scope)
 			return
 		}
 	}
 	c.Next()
 	return
+}
+
+func returnError(c *gin.Context, err error, status int, asset, scope string) {
+	c.AbortWithStatusJSON(status, gin.H{
+		"error":  err.Error(),
+		"asset":  asset,
+		"scope":  scope,
+		"status": status,
+	})
 }

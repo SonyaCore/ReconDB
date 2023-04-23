@@ -12,11 +12,14 @@ var ProgramTypes = []string{
 	"vdp", "rdp",
 }
 
+// not using this pattern because it has some limitation
+// var WildCardPattern = `^(\*|(\*|\*\.)?(\*|\*\.)\w+(\.\w+)*(\.\*|\*)?)$`
+
 // WildCardPattern
 // a regex to validate wildcard domain
-var WildCardPattern = `^(\*|(\*|\*\.)?\w+(\.\w+)*(\.\*|\*)?)$`
+var WildCardPattern = `^(\*|(\*|\*\.)?(\*|\*\.)\w+(\.\w+)*(\.\*|\*)?(\.\*|\*)?)$`
 
-// IPPattern for valdiatin ip with regex
+// IPPattern for validating ip with regex
 // not used for now
 var IPPattern = `^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$`
 
