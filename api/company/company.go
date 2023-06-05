@@ -15,6 +15,15 @@ func AddCompany(c *gin.Context) {
 
 	c.ShouldBindJSON(&Company)
 
+	// checking empty fields for company or program type
+	if Company.CompanyName == "" || Company.ProgramType == "" {
+		c.AbortWithStatusJSON(http.StatusFailedDependency, gin.H{
+			"error":  "empty fields not allowed",
+			"status": http.StatusFailedDependency,
+		})
+		return
+	}
+
 	// insert company to db
 	collection := database.Collection("Company")
 	result, err := collection.InsertOne(database.Ctx, Company)

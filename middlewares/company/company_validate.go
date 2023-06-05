@@ -28,7 +28,6 @@ func ValidateCompanyName(c *gin.Context) {
 
 	companyQuery := bson.M{
 		"companyname": Company.CompanyName,
-		//"programtype": Company.ProgramType,
 	}
 
 	results, err = database.CountDocuments("Company", companyQuery)
@@ -40,5 +39,6 @@ func ValidateCompanyName(c *gin.Context) {
 		})
 		return
 	}
+
 	c.Next()
 }

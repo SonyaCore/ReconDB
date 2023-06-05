@@ -122,6 +122,12 @@ func DeleteAsset(c *gin.Context) {
 		deletedCount = filter.DeletedCount
 	}
 
+	filter, _ = collection.DeleteMany(ctx, bson.M{"companyname": Param})
+	if filter.DeletedCount >= 1 {
+		message = "companyname"
+		deletedCount = filter.DeletedCount
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		message:         Param,
 		"deleted_count": deletedCount,

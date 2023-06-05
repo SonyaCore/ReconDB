@@ -3,7 +3,6 @@ package config
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
 	"log"
 	"time"
 )
@@ -13,19 +12,18 @@ var GinModes = []string{
 }
 
 // GinInit create an instance of gin.Engine and set the proper mode with gin_mode value in configuration file
-func GinInit() *gin.Engine {
-	var ginMode = viper.GetString("gin_mode")
-	if ginMode == "" || len(ginMode) <= 3 {
+func GinInit(configuration Config) *gin.Engine {
+	if configuration.Mode == "" || len(configuration.Mode) <= 3 {
 		log.Fatalf("\u001B[91mgin_mode is empty.\u001B[0m avaliable modes : %v", GinModes)
 	}
 
-	switch ginMode {
+	switch configuration.Mode {
 	case GinModes[0]:
 		gin.SetMode(gin.DebugMode)
 	case GinModes[1]:
 		gin.SetMode(gin.ReleaseMode)
 	default:
-		log.Fatal("No gin_mode set in config.json")
+		log.Fatal("No gin_mode set in configuration.json")
 	}
 
 	router := gin.New()

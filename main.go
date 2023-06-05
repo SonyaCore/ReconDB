@@ -6,7 +6,6 @@ import (
 	"ReconDB/routers"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
 	"log"
 	"runtime"
 	"strings"
@@ -39,25 +38,23 @@ func main() {
 	fmt.Println(VersionStatement())
 
 	// initial config file
-	_, err := config.LoadConfig(".")
+	configuration, err := config.LoadConfig()
 	if err != nil {
 		log.Fatal("config file not found")
 	}
 
-	PORT := viper.GetString("port")
-
 	// register gin engine
-	router := config.GinInit()
+	router := config.GinInit(configuration)
 
 	// config gin engine & register routers
 	routers.RegisterRouter(router)
 
 	// load mongodb
-	client := database.Client()
+	client := database.Client(configuration)
 	// ping database connection
 	database.Ping(client)
-	fmt.Println("\u001B[92mConnected to MongoDB", viper.GetString("mongo_uri"), "\u001B[0m")
+	fmt.Println("\u001B[92mConnected to MongoDB", configuration.MongoURI, "\u001B[0m")
 
 	// run gin
-	router.Run(PORT)
+	router.Run(configuration.PORT)
 }

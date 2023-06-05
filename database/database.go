@@ -1,8 +1,8 @@
 package database
 
 import (
+	"ReconDB/config"
 	"context"
-	"github.com/spf13/viper"
 	"log"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -14,10 +14,9 @@ var Ctx = context.TODO()
 // Client
 // first it get the uri with mongo_uri value in configuration file
 // then it connect to database with mongo.Connect
-func Client() *mongo.Client {
-	var mongoUri = viper.GetString("mongo_uri")
+func Client(config config.Config) *mongo.Client {
 
-	clientOptions := options.Client().ApplyURI(mongoUri)
+	clientOptions := options.Client().ApplyURI(config.MongoURI)
 	client, err := mongo.Connect(Ctx, clientOptions)
 	if err != nil {
 		log.Fatal(err)
