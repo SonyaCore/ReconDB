@@ -13,6 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
+	"net"
 	"net/http"
 	"strings"
 )
@@ -71,6 +72,7 @@ func OutScopeAssetValidate(c *gin.Context) {
 	var ScopeCount int64
 	var outOfScope int64
 	var outOfScopeWildCard int64
+	var outOfScopeCIDR int64
 
 	rawBody, err := utils.ReadBuffer(c)
 
@@ -110,14 +112,13 @@ func OutScopeAssetValidate(c *gin.Context) {
 		}
 	}
 
-	// Check if the Asset are in the out-of-scope collection for single type
-	outOfScopeQuery := bson.M{
+	// Check if the Asset are in the out-of-scope of Scopes collection.
+	ScopeQuery := bson.M{
 		"companyname": Asset.CompanyName,
-		"scopetype":   Asset.AssetType,
-		"scope":       Asset.Asset,
+		"scope":       Asset.Scope,
 	}
 
-	if outOfScope, err = database.CountDocuments("OutofScopes", outOfScopeQuery); err != nil {
+	if outOfScope, err = database.CountDocuments("OutofScopes", ScopeQuery); err != nil {
 		outOfScope = 0
 	}
 
@@ -125,12 +126,6 @@ func OutScopeAssetValidate(c *gin.Context) {
 		utils.ReturnError(c, errors.New("asset is out of Scope"),
 			http.StatusNotAcceptable, Asset.Asset, Asset.Scope)
 		return
-	}
-
-	// Check if the Asset.Scope are in the Scopes collection.
-	ScopeQuery := bson.M{
-		"companyname": Asset.CompanyName,
-		"scope":       Asset.Scope,
 	}
 
 	if ScopeCount, err = database.CountDocuments("Scopes", ScopeQuery); err != nil {
@@ -162,6 +157,37 @@ func OutScopeAssetValidate(c *gin.Context) {
 		}
 		if outOfScopeWildCard > 0 {
 			utils.ReturnError(c, errors.New("asset is out of Scope"),
+				http.StatusNotAcceptable, Asset.Asset, Asset.Scope)
+			return
+		}
+	}
+
+	// Check Asset if Asset.Scope contain wildcard
+	if Asset.AssetType == "ip" && outOfScope == 0 {
+		// Check if cidr exist in OutofScopes Collection
+		outOfScopeCIDRQuery := bson.M{
+			"companyname": Asset.CompanyName,
+			"scope":       Asset.Scope}
+
+		if outOfScopeCIDR, err = database.CountDocuments("OutofScopes", outOfScopeCIDRQuery); err != nil {
+			utils.ReturnError(c, err,
+				http.StatusNotAcceptable, Asset.Asset, Asset.Scope)
+			return
+		}
+		if outOfScopeCIDR > 0 {
+			utils.ReturnError(c, errors.New("asset is out of Scope"),
+				http.StatusNotAcceptable, Asset.Asset, Asset.Scope)
+			return
+		}
+
+		ip := net.ParseIP(Asset.Asset)
+		_, subnet, _ := net.ParseCIDR(Asset.Scope)
+		switch subnet.Contains(ip) {
+		case true:
+			c.Next()
+			break
+		case false:
+			utils.ReturnError(c, errors.New("IP is not within CIDR range"),
 				http.StatusNotAcceptable, Asset.Asset, Asset.Scope)
 			return
 		}
