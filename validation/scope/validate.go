@@ -80,7 +80,7 @@ func OutScopeCheck(c *gin.Context) {
 	}
 
 	// only use this section if request uri was /api/scope
-	if c.Request.RequestURI == configuration.API+"/"+configuration.Scope {
+	if c.Request.RequestURI == configuration.API+configuration.Scope {
 		companyQuery := bson.M{
 			"companyname": Scope.CompanyName,
 		}
@@ -109,7 +109,7 @@ func OutScopeCheck(c *gin.Context) {
 	}
 
 	if results >= 1 {
-		if c.Request.RequestURI == configuration.API+"/"+configuration.Scope {
+		if c.Request.RequestURI == configuration.API+configuration.Scope {
 			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 				"companyname": Scope.CompanyName,
 				"result":      "Out of Scope",
