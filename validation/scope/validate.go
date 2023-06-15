@@ -4,8 +4,8 @@ import (
 	"ReconDB/config"
 	"ReconDB/database"
 	"ReconDB/models"
+	"ReconDB/pkg"
 	"ReconDB/utils"
-	"ReconDB/validation"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -38,8 +38,8 @@ func ValidateScopeType(c *gin.Context) {
 		return
 	}
 
-	for i, _ := range validation.Scopes {
-		if Scope.ScopeType == validation.Scopes[i] {
+	for i, _ := range pkg.Scopes {
+		if Scope.ScopeType == pkg.Scopes[i] {
 			c.Next()
 			return
 		}
@@ -47,7 +47,7 @@ func ValidateScopeType(c *gin.Context) {
 	}
 	c.JSON(http.StatusFailedDependency, gin.H{
 		"error":       "Scope Type is not valid",
-		"valid_types": validation.Scopes,
+		"valid_types": pkg.Scopes,
 		"status":      http.StatusFailedDependency,
 	})
 	c.Abort()

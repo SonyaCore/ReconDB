@@ -1,14 +1,14 @@
 package host
 
 import (
-	"ReconDB/validation"
+	"ReconDB/pkg"
 	"regexp"
 	"strings"
 )
 
 // WildCardRegex used for validating wildcard inputs with WildCardPattern Regex.
 func WildCardRegex(query string) bool {
-	regex := regexp.MustCompile(validation.WildCardPattern)
+	regex := regexp.MustCompile(pkg.WildCardPattern)
 	if regex.MatchString(query) {
 		return true
 	}

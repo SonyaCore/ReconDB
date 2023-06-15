@@ -3,8 +3,8 @@ package company
 import (
 	"ReconDB/database"
 	"ReconDB/models"
+	"ReconDB/pkg"
 	"ReconDB/utils"
-	"ReconDB/validation"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -27,8 +27,8 @@ func ProgramType(c *gin.Context) {
 		return
 	}
 
-	for i, _ := range validation.ProgramTypes {
-		if strings.ToLower(Company.ProgramType) == validation.ProgramTypes[i] {
+	for i, _ := range pkg.ProgramTypes {
+		if strings.ToLower(Company.ProgramType) == pkg.ProgramTypes[i] {
 			c.Next()
 			return
 		}
@@ -37,7 +37,7 @@ func ProgramType(c *gin.Context) {
 
 	c.AbortWithStatusJSON(http.StatusFailedDependency, gin.H{
 		"error":       "Program Type is not valid",
-		"valid_types": validation.ProgramTypes,
+		"valid_types": pkg.ProgramTypes,
 		"status":      http.StatusFailedDependency,
 	})
 	return

@@ -1,4 +1,4 @@
-package validation
+package pkg
 
 // Scopes validate types for inserting in scope
 // in asset only valid types are [ip , single]
