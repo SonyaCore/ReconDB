@@ -1,7 +1,6 @@
-package domain
+package host
 
 import (
-	"ReconDB/pkg/check"
 	"fmt"
 	"strings"
 	"unicode/utf8"
@@ -15,7 +14,7 @@ func CheckDomain(name string) error {
 		parts := strings.Split(name, ":")
 		name = parts[0]
 		port := parts[1]
-		if err := check.Port(port); err != nil {
+		if err := Port(port); err != nil {
 			return fmt.Errorf("%v", err.Error())
 		}
 	}

@@ -15,15 +15,12 @@ var Ctx = context.TODO()
 // first it get the uri with mongo_uri value in configuration file
 // then it connect to database with mongo.Connect
 func Client(config config.Config) *mongo.Client {
-
 	clientOptions := options.Client().ApplyURI(config.MongoURI)
 	client, err := mongo.Connect(Ctx, clientOptions)
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	return client
-
 }
 
 // Ping pinging mongodb connection

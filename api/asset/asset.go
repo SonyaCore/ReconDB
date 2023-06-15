@@ -3,7 +3,7 @@ package asset
 import (
 	"ReconDB/database"
 	"ReconDB/models"
-	"ReconDB/pkg/type"
+	"ReconDB/pkg/typeassert"
 	"context"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -24,8 +24,8 @@ func AddAsset(c *gin.Context) {
 		return
 	}
 
-	// Find the asset type of the given asset
-	asset.AssetType, err = _type.FindAssetType(asset)
+	// Find the asset typeassert of the given asset
+	asset.AssetType, err = typeassert.FindAssetType(asset)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusFailedDependency, gin.H{
 			"error":  err.Error(),

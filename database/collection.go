@@ -11,8 +11,7 @@ func Collection(collection string) *mongo.Collection {
 	config, _ := config.LoadConfig()
 	client := Client(config)
 	// set the database name
-	database := client.Database("ReconDB")
-
+	database := client.Database(config.DataBaseName)
 	Collection := database.Collection(collection)
 	return Collection
 }

@@ -1,4 +1,4 @@
-package middlewares
+package validation
 
 // Scopes validate types for inserting in scope
 // in asset only valid types are [ip , single]
@@ -11,9 +11,6 @@ var Scopes = []string{
 var ProgramTypes = []string{
 	"vdp", "rdp",
 }
-
-// not using this pattern because it has some limitation
-// var WildCardPattern = `^(\*|(\*|\*\.)?(\*|\*\.)\w+(\.\w+)*(\.\*|\*)?)$`
 
 // WildCardPattern
 // a regex to validate wildcard domain

@@ -23,7 +23,7 @@ func GinInit(configuration Config) *gin.Engine {
 	case GinModes[1]:
 		gin.SetMode(gin.ReleaseMode)
 	default:
-		log.Fatal("No gin_mode set in configuration.json")
+		log.Fatal("No gin_mode set in config.json")
 	}
 
 	router := gin.New()

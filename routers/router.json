@@ -1,0 +1,7 @@
+{
+  "api_endpoint" : "/api",
+  "scope" : "/scope",
+  "out_of_scope": "/outscope",
+  "company": "/company",
+  "asset":"/asset"
+}

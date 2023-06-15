@@ -1,6 +1,7 @@
 {
   "authorization": "5dcfdecbfca076e977d962a0c722733d386d6a0097548059ba729b75ea174090",
-  "gin_mode": "debug",
+  "gin_mode": "release",
   "port": ":8080",
-  "mongo_uri": "mongodb://127.0.0.1:27017"
+  "mongo_uri": "mongodb://127.0.0.1:27017",
+  "database": "ReconDB"
 }

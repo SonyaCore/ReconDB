@@ -13,7 +13,7 @@ import (
 
 // Program Info
 var (
-	version  = "0.7.8"
+	version  = "0.8.0"
 	build    = "Custom"
 	codename = "ReconDB , ReconDB Service."
 )
@@ -53,7 +53,8 @@ func main() {
 	client := database.Client(configuration)
 	// ping database connection
 	database.Ping(client)
-	fmt.Println("\u001B[92mConnected to MongoDB", configuration.MongoURI, "\u001B[0m")
+	fmt.Println(
+		"\u001B[92mConnected to MongoDB", configuration.MongoURI+"/"+configuration.DataBaseName, "\u001B[0m")
 
 	// run gin
 	router.Run(configuration.PORT)

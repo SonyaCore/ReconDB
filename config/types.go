@@ -8,4 +8,13 @@ type Config struct {
 	Authorization string `json:"authorization"`
 	PORT          string `json:"port"`
 	MongoURI      string `json:"mongo_uri"`
+	DataBaseName  string `json:"database"`
+}
+
+type RouterURI struct {
+	API        string `json:"api_endpoint"`
+	Scope      string `json:"scope"`
+	OutofScope string `json:"out_of_scope"`
+	Company    string `json:"company"`
+	Asset      string `json:"asset"`
 }

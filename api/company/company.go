@@ -15,7 +15,7 @@ func AddCompany(c *gin.Context) {
 
 	c.ShouldBindJSON(&Company)
 
-	// checking empty fields for company or program type
+	// checking empty fields for company or program typeassert
 	if Company.CompanyName == "" || Company.ProgramType == "" {
 		c.AbortWithStatusJSON(http.StatusFailedDependency, gin.H{
 			"error":  "empty fields not allowed",

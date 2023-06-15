@@ -1,4 +1,4 @@
-package check
+package host
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// IpAddress checks IpAddress and check the port if input contain ":" prefix.
+// IpAddress checks IpAddress and host the port if input contain ":" prefix.
 func IpAddress(ip string) error {
 	if strings.Contains(ip, ":") {
 		parts := strings.Split(ip, ":")
@@ -35,4 +35,10 @@ func Port(port string) error {
 		return fmt.Errorf("port number out of range: %d", portNum)
 	}
 	return nil
+}
+
+// ParseCidr parses valid cidr
+func ParseCidr(cidr string) (net.IP, *net.IPNet, error) {
+	ip, n, err := net.ParseCIDR(cidr)
+	return ip, n, err
 }

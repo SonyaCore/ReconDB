@@ -1,38 +1,34 @@
 package scope
 
 import (
+	"ReconDB/config"
 	"ReconDB/database"
-	"ReconDB/middlewares"
 	"ReconDB/models"
-	"ReconDB/pkg/buffer"
-	"bytes"
+	"ReconDB/utils"
+	"ReconDB/validation"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"io"
 	"log"
 	"net/http"
 	"regexp"
 )
 
-const scopeUri = "/api/scope"
-const outScopeUri = "/api/outscope"
-
 // errors
 var CompanyNotRegister = "Scope are not registered for this company"
 var DuplicateEntry = "Duplicate Entry"
 
-// ValidateScopeType check the type of scope with middlewares.Scopes
+// ValidateScopeType host the typeassert of scope with validation.Scopes
 // if it was not in scopes []string c.Abort with error message otherwise c.Next()
 func ValidateScopeType(c *gin.Context) {
 	var Scope models.Scopes
 
-	// Read the content
-	rawBody, err := io.ReadAll(c.Request.Body)
+	rawBody, err := utils.ReadBuffer(c)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, rawBody)
+		log.Println(err)
+		return
 	}
 
 	// Unmarshal rawBody to Scope
@@ -42,11 +38,8 @@ func ValidateScopeType(c *gin.Context) {
 		return
 	}
 
-	// Restore the io.ReadCloser to its original state
-	c.Request.Body = io.NopCloser(bytes.NewBuffer(rawBody))
-
-	for i, _ := range middlewares.Scopes {
-		if Scope.ScopeType == middlewares.Scopes[i] {
+	for i, _ := range validation.Scopes {
+		if Scope.ScopeType == validation.Scopes[i] {
 			c.Next()
 			return
 		}
@@ -54,7 +47,7 @@ func ValidateScopeType(c *gin.Context) {
 	}
 	c.JSON(http.StatusFailedDependency, gin.H{
 		"error":       "Scope Type is not valid",
-		"valid_types": middlewares.Scopes,
+		"valid_types": validation.Scopes,
 		"status":      http.StatusFailedDependency,
 	})
 	c.Abort()
@@ -63,9 +56,12 @@ func ValidateScopeType(c *gin.Context) {
 
 func OutScopeCheck(c *gin.Context) {
 	var Scope models.Scopes
+	var configuration config.RouterURI
 	var results int64
 
-	rawBody, err := buffer.ReadBuffer(c)
+	configuration, _ = config.RouterConfig()
+
+	rawBody, err := utils.ReadBuffer(c)
 
 	// Unmarshal rawBody to Scope
 	err = json.Unmarshal(rawBody, &Scope)
@@ -84,7 +80,7 @@ func OutScopeCheck(c *gin.Context) {
 	}
 
 	// only use this section if request uri was /api/scope
-	if c.Request.RequestURI == scopeUri {
+	if c.Request.RequestURI == configuration.API+"/"+configuration.Scope {
 		companyQuery := bson.M{
 			"companyname": Scope.CompanyName,
 		}
@@ -113,7 +109,7 @@ func OutScopeCheck(c *gin.Context) {
 	}
 
 	if results >= 1 {
-		if c.Request.RequestURI == scopeUri {
+		if c.Request.RequestURI == configuration.API+"/"+configuration.Scope {
 			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 				"companyname": Scope.CompanyName,
 				"result":      "Out of Scope",
@@ -130,7 +126,6 @@ func OutScopeCheck(c *gin.Context) {
 		})
 		return
 	}
-
 	c.Next()
 }
 
