@@ -106,5 +106,9 @@ docker-compose up -d
 }
 ```
 
+## Postman Collection
+Use this [ReconDB.postman_collection.json](https://github.com/SonyaCore/ReconDB/blob/main/ReconDB.postman_collection.json) file for testing endpoints with postman.
+
+
 
 [go]: https://img.shields.io/badge/Go-cyan?logo=go
