@@ -84,6 +84,7 @@ func OutScopeCheck(c *gin.Context) {
 		companyQuery := bson.M{
 			"companyname": Scope.CompanyName,
 		}
+		// Perform Company Check
 		results, err = CompanyCheck(companyQuery)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
@@ -92,6 +93,7 @@ func OutScopeCheck(c *gin.Context) {
 				"status": http.StatusNotAcceptable,
 			})
 		}
+		// Perform Duplicate check
 		results, err = DuplicateCheck(ScopeQuery)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{

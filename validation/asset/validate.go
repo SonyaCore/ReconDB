@@ -182,14 +182,9 @@ func OutScopeAssetValidate(c *gin.Context) {
 
 		ip := net.ParseIP(Asset.Asset)
 		_, subnet, _ := net.ParseCIDR(Asset.Scope)
-		switch subnet.Contains(ip) {
-		case true:
-			c.Next()
-			break
-		case false:
+		if !subnet.Contains(ip) {
 			utils.ReturnError(c, errors.New("IP is not within CIDR range"),
 				http.StatusNotAcceptable, Asset.Asset, Asset.Scope)
-			return
 		}
 	}
 

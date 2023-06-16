@@ -12,9 +12,10 @@ import (
 	"strings"
 )
 
-// ValidateHost validates host according to their types and ensure that the input is valid.
+// ValidateHost validates host according to their types to ensure the input is valid.
 func ValidateHost(c *gin.Context) {
 	var Scope models.Scopes
+
 	rawBody, err := utils.ReadBuffer(c)
 	// Unmarshal rawBody to Scope
 	err = json.Unmarshal(rawBody, &Scope)
@@ -23,7 +24,8 @@ func ValidateHost(c *gin.Context) {
 		return
 	}
 
-	if strings.ToLower(Scope.ScopeType) == "single" {
+	switch strings.ToLower(Scope.ScopeType) {
+	case "single":
 		if err = host.CheckDomain(Scope.Scope); err != nil {
 			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 				"input":  Scope.Scope,
@@ -34,9 +36,7 @@ func ValidateHost(c *gin.Context) {
 		}
 		c.Next()
 		return
-	}
-
-	if strings.ToLower(Scope.ScopeType) == "wildcard" {
+	case "wildcard":
 		if !strings.Contains(Scope.Scope, "*") {
 			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 				"input":  Scope.Scope,
@@ -54,9 +54,7 @@ func ValidateHost(c *gin.Context) {
 			"status": http.StatusNotAcceptable,
 		})
 		return
-	}
-
-	if strings.ToLower(Scope.ScopeType) == "cidr" {
+	case "cidr":
 		ip, n, err := host.ParseCidr(Scope.Scope)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
@@ -69,16 +67,14 @@ func ValidateHost(c *gin.Context) {
 
 		if !n.IP.Equal(ip) {
 			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
-				"error":  fmt.Sprintf("got %s; want %v\n", Scope.Scope, n),
+				"error":  fmt.Sprintf("got %s; want %v", Scope.Scope, n),
 				"status": http.StatusNotAcceptable,
 			})
 			return
 		}
 		c.Next()
 		return
-	}
-
-	if strings.ToLower(Scope.ScopeType) == "ip" {
+	case "ip":
 		if err = host.IpAddress(Scope.Scope); err != nil {
 			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 				"input":  Scope.Scope,
@@ -89,13 +85,12 @@ func ValidateHost(c *gin.Context) {
 		}
 		c.Next()
 		return
+	default:
+		c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
+			"input":  Scope.Scope,
+			"error":  "cannot find related Scope type",
+			"status": http.StatusNotAcceptable,
+		})
+		return
 	}
-
-	c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
-		"input":  Scope.Scope,
-		"error":  "cannot find related Scope type",
-		"status": http.StatusNotAcceptable,
-	})
-	return
-
 }

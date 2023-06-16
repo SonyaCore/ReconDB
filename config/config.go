@@ -10,7 +10,13 @@ import (
 
 // LoadConfig load the configuration file and return Config object.
 func LoadConfig() (config Config, err error) {
-	file, err := os.Open("config.json")
+	var configName = "config.json"
+
+	if len(os.Args) > 1 {
+		configName = os.Args[1]
+	}
+
+	file, err := os.Open(configName)
 	if err != nil {
 		return Config{}, err
 	}
@@ -37,7 +43,13 @@ func RouterConfig() (config RouterURI, err error) {
 		return RouterURI{}, err
 	}
 
-	file, err := os.Open(path.Join(pwd, "routers", "router.json"))
+	var configName = path.Join(pwd, "routers", "router.json")
+
+	if len(os.Args) > 2 {
+		configName = os.Args[2]
+	}
+
+	file, err := os.Open(configName)
 	if err != nil {
 		return RouterURI{}, err
 	}
