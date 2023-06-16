@@ -140,15 +140,12 @@ func OutScopeAssetValidate(c *gin.Context) {
 
 	// Check Asset if Asset.Scope contain wildcard
 	if strings.Contains(Asset.Scope, "*") && outOfScope == 0 {
-		var Scope = utils.WildCardToRegex(Asset.Scope)
+		//var Scope = utils.WildCardToRegex(Asset.Scope)
 
 		outOfScopeWildCardQuery := bson.M{
 			"companyname": Asset.CompanyName,
 			"scopetype":   "wildcard",
-			"scope": primitive.Regex{
-				Pattern: "^" + Scope + "$",
-				Options: "i",
-			}}
+			"scope":       Asset.Scope}
 
 		if outOfScopeWildCard, err = database.CountDocuments("OutofScopes", outOfScopeWildCardQuery); err != nil {
 			utils.ReturnError(c, err,

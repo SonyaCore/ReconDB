@@ -37,20 +37,13 @@ func ValidateHost(c *gin.Context) {
 		c.Next()
 		return
 	case "wildcard":
-		if !strings.Contains(Scope.Scope, "*") {
-			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
-				"input":  Scope.Scope,
-				"error":  "Not a valid Wildcard",
-				"status": http.StatusNotAcceptable,
-			})
-		}
-		if host.WildCardRegex(Scope.Scope) {
+		if err = host.CheckWildCard(Scope.Scope); err == nil {
 			c.Next()
 			return
 		}
 		c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
 			"input":  Scope.Scope,
-			"error":  "Host wildcard is not acceptable",
+			"error":  err.Error(),
 			"status": http.StatusNotAcceptable,
 		})
 		return
